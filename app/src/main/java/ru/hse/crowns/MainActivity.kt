@@ -21,7 +21,36 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         binding.navView.setupWithNavController(navController)
 
-        // Set icon tint list to null to use original colors of menuItems
-        binding.navView.itemIconTintList = null
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.navigation_n_queens -> {
+                    binding.navView.itemIconTintList =
+                        resources.getColorStateList(R.color.nav_bar_n_queens_tint, null)
+                    binding.navView.itemTextColor =
+                        resources.getColorStateList(R.color.nav_bar_n_queens_tint, null)
+                    binding.navView.itemRippleColor =
+                        resources.getColorStateList(R.color.nav_bar_n_queens_tint, null)
+                }
+
+                R.id.navigation_queens -> {
+                    binding.navView.itemIconTintList =
+                        resources.getColorStateList(R.color.nav_bar_queens_tint, null)
+                    binding.navView.itemTextColor =
+                        resources.getColorStateList(R.color.nav_bar_queens_tint, null)
+                    binding.navView.itemRippleColor =
+                        resources.getColorStateList(R.color.nav_bar_queens_tint, null)
+                }
+
+                R.id.navigation_killer_sudoku -> {
+                    binding.navView.itemIconTintList =
+                        resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
+                    binding.navView.itemTextColor =
+                        resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
+                    binding.navView.itemRippleColor =
+                        resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
+                }
+            }
+        }
+
     }
 }
