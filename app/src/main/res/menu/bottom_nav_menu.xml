@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_n_queens"
         android:icon="@drawable/ic_chess_selector"
         android:title="@string/title_n_queens" />
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_queens"
         android:icon="@drawable/ic_crown_selector"
         android:title="@string/title_queens" />
 
     <item
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_killer_sudoku"
         android:icon="@drawable/ic_skull_selector"
         android:title="@string/title_killer_sudoku" />
 

@@ -1,4 +1,4 @@
-package ru.hse.crowns.ui.home
+package ru.hse.crowns.ui.nQueensHome
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import ru.hse.crowns.databinding.FragmentHomeBinding
+import ru.hse.crowns.databinding.FragmentNQueensHomeBinding
 
-class HomeFragment : Fragment() {
+class NQueensHomeFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
+    private var _binding: FragmentNQueensHomeBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -22,14 +22,14 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+        val nQueensHomeViewModel =
+            ViewModelProvider(this).get(NQueensHomeViewModel::class.java)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentNQueensHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
+        nQueensHomeViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root
