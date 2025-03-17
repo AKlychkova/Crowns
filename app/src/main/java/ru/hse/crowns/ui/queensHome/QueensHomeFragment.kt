@@ -1,4 +1,4 @@
-package ru.hse.crowns.ui.notifications
+package ru.hse.crowns.ui.queensHome
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import ru.hse.crowns.databinding.FragmentNotificationsBinding
+import ru.hse.crowns.databinding.FragmentQueensHomeBinding
 
-class NotificationsFragment : Fragment() {
+class QueensHomeFragment : Fragment() {
 
-    private var _binding: FragmentNotificationsBinding? = null
+    private var _binding: FragmentQueensHomeBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -22,14 +22,14 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(NotificationsViewModel::class.java)
+        val queensHomeViewModel =
+            ViewModelProvider(this).get(QueensHomeViewModel::class.java)
 
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        _binding = FragmentQueensHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textNotifications
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
+        val textView: TextView = binding.textDashboard
+        queensHomeViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
         return root

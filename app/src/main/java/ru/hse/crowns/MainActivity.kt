@@ -1,11 +1,8 @@
 package ru.hse.crowns
 
 import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import ru.hse.crowns.databinding.ActivityMainBinding
 
@@ -19,17 +16,41 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navView: BottomNavigationView = binding.navView
+        // Set up navigation between home screens
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.navView.setupWithNavController(navController)
 
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.navigation_n_queens -> {
+                    binding.navView.itemIconTintList =
+                        resources.getColorStateList(R.color.nav_bar_n_queens_tint, null)
+                    binding.navView.itemTextColor =
+                        resources.getColorStateList(R.color.nav_bar_n_queens_tint, null)
+                    binding.navView.itemRippleColor =
+                        resources.getColorStateList(R.color.nav_bar_n_queens_tint, null)
+                }
+
+                R.id.navigation_queens -> {
+                    binding.navView.itemIconTintList =
+                        resources.getColorStateList(R.color.nav_bar_queens_tint, null)
+                    binding.navView.itemTextColor =
+                        resources.getColorStateList(R.color.nav_bar_queens_tint, null)
+                    binding.navView.itemRippleColor =
+                        resources.getColorStateList(R.color.nav_bar_queens_tint, null)
+                }
+
+                R.id.navigation_killer_sudoku -> {
+                    binding.navView.itemIconTintList =
+                        resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
+                    binding.navView.itemTextColor =
+                        resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
+                    binding.navView.itemRippleColor =
+                        resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
+                }
+            }
+        }
+
     }
 }
