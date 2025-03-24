@@ -5,15 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.hse.crowns.R
 import ru.hse.crowns.databinding.FragmentKillerSudokuHomeBinding
 
-class KillerSudokuFragment : Fragment() {
+class KillerSudokuHomeFragment : Fragment() {
 
     private var _binding: FragmentKillerSudokuHomeBinding? = null
     private val binding get() = _binding!!
+    private val viewModel : KillerSudokuHomeViewModel by viewModel()
 
     enum class DifficultyLevels {
         EASY,
@@ -26,9 +27,6 @@ class KillerSudokuFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val killerSudokuViewModel =
-            ViewModelProvider(this).get(KillerSudokuViewModel::class.java)
-
         _binding = FragmentKillerSudokuHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 

@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/navigation_killer_sudoku"
-        android:name="ru.hse.crowns.ui.killerSudokuHome.KillerSudokuFragment"
+        android:name="ru.hse.crowns.ui.killerSudokuHome.KillerSudokuHomeFragment"
         android:label="@string/title_killer_sudoku"
         tools:layout="@layout/fragment_killer_sudoku_home">
         <argument
