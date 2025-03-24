@@ -4,18 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import ru.hse.crowns.R
 import ru.hse.crowns.databinding.FragmentKillerSudokuHomeBinding
 
 class KillerSudokuFragment : Fragment() {
 
     private var _binding: FragmentKillerSudokuHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+
+    enum class DifficultyLevels {
+        EASY,
+        MEDIUM,
+        DIFFICULT
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,10 +32,24 @@ class KillerSudokuFragment : Fragment() {
         _binding = FragmentKillerSudokuHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textNotifications
-        killerSudokuViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        binding.startKillerSudokuButton.setOnClickListener { view ->
+            val bundle = Bundle()
+            when (binding.difficultyRadioGroup.checkedRadioButtonId) {
+                R.id.easyRadioButton -> {
+                    bundle.putInt("difficultyLevel", DifficultyLevels.EASY.ordinal)
+                }
+                R.id.mediumRadioButton -> {
+                    bundle.putInt("difficultyLevel", DifficultyLevels.MEDIUM.ordinal)
+                }
+                R.id.difficultrRadioButton -> {
+                    bundle.putInt("difficultyLevel", DifficultyLevels.DIFFICULT.ordinal)
+                }
+            }
+
+            view.findNavController()
+                .navigate(R.id.action_navigation_killer_sudoku_to_gameFragment, bundle)
         }
+
         return root
     }
 

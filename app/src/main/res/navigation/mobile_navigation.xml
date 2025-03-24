@@ -9,17 +9,48 @@
         android:id="@+id/navigation_n_queens"
         android:name="ru.hse.crowns.ui.nQueensHome.NQueensHomeFragment"
         android:label="@string/title_n_queens"
-        tools:layout="@layout/fragment_n_queens_home" />
+        tools:layout="@layout/fragment_n_queens_home">
+        <argument
+            android:name="ShowBottomBar"
+            app:argType="boolean"
+            android:defaultValue="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_queens"
         android:name="ru.hse.crowns.ui.queensHome.QueensHomeFragment"
         android:label="@string/title_queens"
-        tools:layout="@layout/fragment_queens_home" />
+        tools:layout="@layout/fragment_queens_home">
+        <argument
+            android:name="ShowBottomBar"
+            app:argType="boolean"
+            android:defaultValue="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_killer_sudoku"
         android:name="ru.hse.crowns.ui.killerSudokuHome.KillerSudokuFragment"
         android:label="@string/title_killer_sudoku"
-        tools:layout="@layout/fragment_killer_sudoku_home" />
+        tools:layout="@layout/fragment_killer_sudoku_home">
+        <argument
+            android:name="ShowBottomBar"
+            app:argType="boolean"
+            android:defaultValue="true" />
+        <action
+            android:id="@+id/action_navigation_killer_sudoku_to_gameFragment"
+            app:destination="@id/gameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="ru.hse.crowns.ui.game.GameFragment"
+        android:label="fragment_game"
+        tools:layout="@layout/fragment_game">
+        <argument
+            android:name="ShowBottomBar"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="difficultyLevel"
+            app:argType="integer" />
+    </fragment>
 </navigation>
