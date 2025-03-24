@@ -1,5 +1,7 @@
 package ru.hse.crowns.generation.killerSudoku
 
+import ru.hse.crowns.boards.KillerSudokuBoard
+
 /**
  * @property maxToClear maximum number of empty cells in generated Killer Sudoku level
  */

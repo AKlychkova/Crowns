@@ -1,4 +1,4 @@
-package ru.hse.crowns.generation.nQueens
+package ru.hse.crowns.boards
 
 /**
  * @property size board dimension

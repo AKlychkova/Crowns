@@ -1,5 +1,7 @@
 package ru.hse.crowns.generation.nQueens
 
+import ru.hse.crowns.boards.NQueensBoard
+
 class NQueensGenerator(
     private val boardSize: Int,
     private val uniqueChecker: NQueensUniqueChecker,

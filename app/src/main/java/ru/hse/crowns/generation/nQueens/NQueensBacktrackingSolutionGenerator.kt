@@ -1,5 +1,7 @@
 package ru.hse.crowns.generation.nQueens
 
+import ru.hse.crowns.boards.NQueensBoard
+
 class NQueensBacktrackingSolutionGenerator : NQueensSolutionGenerator {
     /**
      * Generate a random solution to the N queens problem for an [n][boardSize]-by-[n][boardSize] board

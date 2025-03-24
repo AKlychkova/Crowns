@@ -1,4 +1,4 @@
-package ru.hse.crowns.generation.killerSudoku
+package ru.hse.crowns.boards
 
 import kotlin.math.roundToInt
 import kotlin.math.sqrt

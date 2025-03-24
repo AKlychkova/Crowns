@@ -1,5 +1,7 @@
 package ru.hse.crowns.generation.nQueens
 
+import ru.hse.crowns.boards.NQueensBoard
+
 interface NQueensSolutionGenerator {
     /**
      * Generate a random solution to the N Queens puzzle for an [n][boardSize]-by-[n][boardSize] board

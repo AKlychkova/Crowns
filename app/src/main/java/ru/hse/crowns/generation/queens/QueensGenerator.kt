@@ -1,5 +1,7 @@
 package ru.hse.crowns.generation.queens
 
+import ru.hse.crowns.boards.QueensBoard
+
 class QueensGenerator(private val boardSize: Int,
                       private val uniqueChecker: QueensUniqueChecker,
                       private val solutionGenerator: QueensSolutionGenerator

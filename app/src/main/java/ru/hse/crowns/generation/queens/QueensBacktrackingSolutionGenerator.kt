@@ -1,5 +1,6 @@
 package ru.hse.crowns.generation.queens
 
+import ru.hse.crowns.boards.QueensBoard
 import kotlin.math.abs
 
 class QueensBacktrackingSolutionGenerator: QueensSolutionGenerator {

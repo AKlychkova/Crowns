@@ -1,6 +1,6 @@
 package ru.hse.crowns.generation.dancingLinks
 
-import ru.hse.crowns.generation.nQueens.NQueensBoard
+import ru.hse.crowns.boards.NQueensBoard
 import ru.hse.crowns.generation.nQueens.NQueensUniqueChecker
 
 class NQueensDLUniqueChecker : DLUniqueChecker(), NQueensUniqueChecker {
