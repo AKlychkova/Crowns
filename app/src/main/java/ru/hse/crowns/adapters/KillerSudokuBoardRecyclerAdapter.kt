@@ -28,6 +28,7 @@ class KillerSudokuBoardRecyclerAdapter(private var board: KillerSudokuBoard) :
         val column = position % board.size
         val value: Int? = board.getValue(row, column)
         val polyominoId = board.getPolyomino(row, column)
+        val emptyString: String = holder.itemView.resources.getString(R.string.empty)
 
         // Set value
         holder.setValuePicture(
@@ -36,7 +37,7 @@ class KillerSudokuBoardRecyclerAdapter(private var board: KillerSudokuBoard) :
             } else {
                 null
             },
-            value?.toString() ?: "empty"
+            value?.toString() ?: emptyString
         )
 
         // Set polyomino color

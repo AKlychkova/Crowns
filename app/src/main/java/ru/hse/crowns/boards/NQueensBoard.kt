@@ -27,7 +27,8 @@ class NQueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
      */
     fun removeQueen(row: Int, column: Int) {
         if (row !in 0 until size ||
-            column !in 0 until size) {
+            column !in 0 until size
+        ) {
             throw IndexOutOfBoundsException()
         }
         queenPositions.remove(Pair(row, column))
@@ -54,4 +55,11 @@ class NQueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
      * @return a list of queens coordinates
      */
     fun getQueenPositions(): List<Pair<Int, Int>> = queenPositions.toList()
+
+    /**
+     * @return true if there is a queen in the cell else false
+     * @param row row of the cell
+     * @param column column of the cell
+     */
+    fun hasQueen(row: Int, column: Int): Boolean = Pair(row, column) in queenPositions
 }

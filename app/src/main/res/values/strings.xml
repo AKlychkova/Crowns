@@ -8,4 +8,7 @@
     <string name="medium">Средний</string>
     <string name="difficult">Сложный</string>
     <string name="boardContentDescription">Игровое поле</string>
+    <string name="fers">Ферзь</string>
+    <string name="queen">Королева</string>
+    <string name="empty">Пусто</string>
 </resources>

@@ -155,4 +155,11 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
             emptyList()
         }
     }
+
+    /**
+     * @return true if there is a queen in the cell else false
+     * @param row row of the cell
+     * @param column column of the cell
+     */
+    fun hasQueen(row: Int, column: Int): Boolean = Pair(row, column) in queenPositions
 }
