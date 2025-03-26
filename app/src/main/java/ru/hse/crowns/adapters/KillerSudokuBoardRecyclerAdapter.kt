@@ -35,7 +35,8 @@ class KillerSudokuBoardRecyclerAdapter(private var board: KillerSudokuBoard) :
                 numbersDrawables.getDrawable(value - 1)
             } else {
                 null
-            }
+            },
+            value?.toString() ?: "empty"
         )
 
         // Set polyomino color
