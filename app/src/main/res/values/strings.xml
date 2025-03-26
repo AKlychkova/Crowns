@@ -7,4 +7,5 @@
     <string name="easy">Простой</string>
     <string name="medium">Средний</string>
     <string name="difficult">Сложный</string>
+    <string name="boardContentDescription">Игровое поле</string>
 </resources>
