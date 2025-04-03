@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.hse.crowns.R
-import ru.hse.crowns.boards.QueensBoard
+import ru.hse.crowns.domain.boards.QueensBoard
 import ru.hse.crowns.databinding.BoardCellBinding
 
 class QueensBoardRecyclerAdapter(private var board: QueensBoard) : RecyclerView.Adapter<BoardCellViewHolder>() {
