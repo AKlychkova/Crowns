@@ -7,9 +7,18 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="queens_light">#fef167</color>
     <color name="queens">#FFD700</color>
+    <color name="queens_semi_dark">#ffc000</color>
+    <color name="queens_dark">#fe7a00</color>
+    <color name="killer_sudoku_light">#97e5dd</color>
     <color name="killer_sudoku">#30D5C8</color>
+    <color name="killer_sudoku_dark">#00b19c</color>
+    <color name="n_queens_light">#ffbbd1</color>
     <color name="n_queens">#ff3178</color>
+    <color name="n_queens_dark">#ed005e</color>
     <color name="gray">#D0D0D0</color>
+    <color name="dark_gray">#C0C0C0</color>
+    <color name="very_dark_gray">#696969</color>
     <color name="cell_border">#FF000000</color>
 </resources>

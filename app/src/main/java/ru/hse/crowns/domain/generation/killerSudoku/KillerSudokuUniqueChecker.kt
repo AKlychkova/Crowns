@@ -6,5 +6,5 @@ interface KillerSudokuUniqueChecker {
     /**
      * @return true if [board] has no more than one solution, otherwise false
      */
-    fun check(board: KillerSudokuBoard) : Boolean
+    suspend fun check(board: KillerSudokuBoard) : Boolean
 }

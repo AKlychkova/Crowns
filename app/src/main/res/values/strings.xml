@@ -11,4 +11,12 @@
     <string name="fers">Ферзь</string>
     <string name="queen">Королева</string>
     <string name="empty">Пусто</string>
+    <string name="five">5</string>
+    <string name="six">6</string>
+    <string name="seven">7</string>
+    <string name="eight">8</string>
+    <string name="nine">9</string>
+    <string name="ten">10</string>
+    <string name="coins">Монетки</string>
+    <string name="hints">Подсказки</string>
 </resources>

@@ -6,5 +6,5 @@ interface NQueensUniqueChecker {
     /**
      * @return true if [board] has no more than one solution, otherwise false
      */
-    fun check(board: NQueensBoard) : Boolean
+    suspend fun check(board: NQueensBoard) : Boolean
 }

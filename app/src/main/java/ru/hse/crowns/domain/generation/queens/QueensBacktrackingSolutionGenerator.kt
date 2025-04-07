@@ -10,7 +10,7 @@ class QueensBacktrackingSolutionGenerator: QueensSolutionGenerator {
      * @param boardSize n
      * @return generated board
      */
-    override fun generateSolution(boardSize: Int): QueensBoard {
+    override suspend fun generateSolution(boardSize: Int): QueensBoard {
         /**
          * An array in which each pair (index, value) corresponds to the coordinates of the queen (row, column)
          */

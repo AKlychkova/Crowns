@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     testImplementation(libs.junit)

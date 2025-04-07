@@ -107,7 +107,7 @@ class KillerSudokuDLUniqueChecker : DLUniqueChecker(), KillerSudokuUniqueChecker
         return dlMatrix
     }
 
-    override fun check(board: KillerSudokuBoard): Boolean {
+    override suspend fun check(board: KillerSudokuBoard): Boolean {
         // Set board
         this.board = board
         currentPolyominoSums = IntArray(board.getPolyominoCount()) {0}

@@ -1,4 +1,4 @@
-package ru.hse.crowns.ui.game.killerSudokuGame
+package ru.hse.crowns.ui.game.queensGame
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,14 +8,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.boards.QueensBoard
 import ru.hse.crowns.domain.generation.Generator
 
-class KillerSudokuGameViewModel(
-    private val boardGenerator: Generator<KillerSudokuBoard>
+class QueensGameViewModel(
+    private val boardGenerator: Generator<QueensBoard>
 ) : ViewModel() {
-    private val _boardLD = MutableLiveData<KillerSudokuBoard>()
-    val boardLD: LiveData<KillerSudokuBoard> get() = _boardLD
+
+    private val _boardLD = MutableLiveData <QueensBoard>()
+    val boardLD: LiveData<QueensBoard> get() = _boardLD
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -44,6 +45,6 @@ class KillerSudokuGameViewModel(
 
     fun onCellClick(row: Int, column: Int) {
         // TODO
-        boardLD.value?.clearCell(row, column)
+        boardLD.value?.removeQueen(row, column)
     }
 }

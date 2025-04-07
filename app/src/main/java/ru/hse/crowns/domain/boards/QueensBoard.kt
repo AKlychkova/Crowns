@@ -4,7 +4,7 @@ package ru.hse.crowns.domain.boards
  * @property size board dimension
  * @property queenPositions queens coordinates
  */
-class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
+class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : ObservableBoard {
     /**
      * Set of queens coordinates
      */
@@ -20,6 +20,11 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
      * Stores the polyomino id for each cell
      */
     private val polyominoDivision: Array<IntArray>
+
+    /**
+     * The list of observers
+     */
+    private val observers = ArrayList<BoardObserver>()
 
     init {
         // randomly divide the board into polyominoes
@@ -48,6 +53,7 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
             throw IndexOutOfBoundsException()
         }
         queenPositions.remove(Pair(row, column))
+        notifyObservers(row, column)
     }
 
     /**
@@ -57,6 +63,7 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
     fun addQueen(row: Int, column: Int) {
         if (row in 0 until size && column in 0 until size) {
             queenPositions.add(Pair(row, column))
+            notifyObservers(row, column)
         } else {
             throw IndexOutOfBoundsException()
         }
@@ -162,4 +169,22 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) {
      * @param column column of the cell
      */
     fun hasQueen(row: Int, column: Int): Boolean = Pair(row, column) in queenPositions
+
+    override fun addObserver(observer: BoardObserver) {
+        observers.add(observer)
+    }
+
+    override fun removeObserver(observer: BoardObserver) {
+        observers.remove(observer)
+    }
+
+    override fun notifyObservers(row: Int, column: Int) {
+        for(observer: BoardObserver in observers) {
+            observer.onChanged(row, column)
+        }
+    }
+
+    override fun clearObservers() {
+        observers.clear()
+    }
 }

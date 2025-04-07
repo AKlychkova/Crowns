@@ -25,7 +25,7 @@ class NavigationBarTest {
         onView(withId(R.id.navigation_n_queens))
             .perform(click())
 
-        onView(withId(R.id.text_home)).check(matches(isDisplayed()))
+        onView(withId(R.id.startNQueensButton)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -36,7 +36,7 @@ class NavigationBarTest {
         onView(withId(R.id.navigation_queens))
             .perform(click())
 
-        onView(withId(R.id.text_dashboard)).check(matches(isDisplayed()))
+        onView(withId(R.id.startQueensButton)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -47,6 +47,6 @@ class NavigationBarTest {
         onView(withId(R.id.navigation_killer_sudoku))
             .perform(click())
 
-        onView(withId(R.id.text_notifications)).check(matches(isDisplayed()))
+        onView(withId(R.id.startKillerSudokuButton)).check(matches(isDisplayed()))
     }
 }

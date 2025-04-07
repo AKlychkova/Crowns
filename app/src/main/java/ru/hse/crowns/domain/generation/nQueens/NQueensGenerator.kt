@@ -13,7 +13,7 @@ class NQueensGenerator(
      * Removes random queens without violating the unique solution condition
      * @param board board from which queens must be removed
      */
-    private fun removeQueens(board: NQueensBoard) {
+    private suspend fun removeQueens(board: NQueensBoard) {
         val solutionQueenPositions = board.getQueenPositions()
         // Go through the queens in random order
         for (queen in solutionQueenPositions.shuffled()) {
@@ -29,7 +29,7 @@ class NQueensGenerator(
      * Generate level of "N Queens" puzzle
      * @return generated level
      */
-    override fun generate(): NQueensBoard {
+    override suspend fun generate(): NQueensBoard {
         // Generate valid solution
         val board = solutionGenerator.generateSolution(boardSize)
         // Remove some queens

@@ -66,7 +66,7 @@ class NQueensDLUniqueChecker : DLUniqueChecker(), NQueensUniqueChecker {
         return dlMatrix
     }
 
-    override fun check(board: NQueensBoard): Boolean {
+    override suspend fun check(board: NQueensBoard): Boolean {
         this.board = board
         return check()
     }

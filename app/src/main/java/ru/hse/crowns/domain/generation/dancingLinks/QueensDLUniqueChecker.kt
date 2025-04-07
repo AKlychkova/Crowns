@@ -84,7 +84,7 @@ class QueensDLUniqueChecker : DLUniqueChecker(), QueensUniqueChecker {
         return dlMatrix
     }
 
-    override fun check(board: QueensBoard): Boolean {
+    override suspend fun check(board: QueensBoard): Boolean {
         this.board = board
         return check()
     }

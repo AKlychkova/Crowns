@@ -1,48 +1,46 @@
-package ru.hse.crowns.ui.game.killerSudokuGame
+package ru.hse.crowns.ui.game.nQueensGame
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import org.koin.androidx.viewmodel.ext.android.getViewModel
-import ru.hse.crowns.databinding.FragmentKillerSudokuGameBinding
 import org.koin.core.parameter.parametersOf
-import ru.hse.crowns.adapters.KillerSudokuBoardRecyclerAdapter
+import ru.hse.crowns.adapters.NQueensBoardRecyclerAdapter
+import ru.hse.crowns.databinding.FragmentNQueensGameBinding
 import ru.hse.crowns.domain.boards.BoardObserver
-import ru.hse.crowns.utils.KillerSudokuDifficultyLevel
 
-class KillerSudokuGameFragment() : Fragment() {
-    private var _binding: FragmentKillerSudokuGameBinding? = null
+class NQueensGameFragment : Fragment() {
+    private var _binding: FragmentNQueensGameBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: KillerSudokuGameViewModel
-    private lateinit var boardAdapter: KillerSudokuBoardRecyclerAdapter
+    private lateinit var viewModel: NQueensGameViewModel
+
+    private lateinit var boardAdapter: NQueensBoardRecyclerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentKillerSudokuGameBinding.inflate(inflater, container, false)
+        _binding = FragmentNQueensGameBinding.inflate(inflater, container, false)
 
         // define viewmodel
-        val level: KillerSudokuDifficultyLevel = arguments?.getInt("difficultyLevel")?.let {
-            KillerSudokuDifficultyLevel.entries[it]
-        } ?: KillerSudokuDifficultyLevel.MEDIUM
-        viewModel = getViewModel { parametersOf(level.getMaxToDelete()) }
+        val boardSize: Int = arguments?.getInt("boardSize") ?: 8
+        viewModel = getViewModel { parametersOf(boardSize) }
 
         // define recycler view
-        binding.board.recyclerView.layoutManager = object : GridLayoutManager(context, 9) {
-            override fun canScrollVertically(): Boolean {
+        binding.board.recyclerView.layoutManager = object : GridLayoutManager(context, boardSize) {
+            override fun canScrollVertically() : Boolean {
                 return false
             }
         }
 
-        boardAdapter = KillerSudokuBoardRecyclerAdapter({ row, column ->
+        boardAdapter = NQueensBoardRecyclerAdapter { row, column ->
             viewModel.onCellClick(row, column)
-        })
+        }
         binding.board.recyclerView.adapter = boardAdapter
 
         observeViewModel()
@@ -52,7 +50,7 @@ class KillerSudokuGameFragment() : Fragment() {
 
     private fun observeViewModel() {
         viewModel.isLoading.observe(viewLifecycleOwner) {
-            if (it) {
+            if(it) {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.content.visibility = View.GONE
             } else {

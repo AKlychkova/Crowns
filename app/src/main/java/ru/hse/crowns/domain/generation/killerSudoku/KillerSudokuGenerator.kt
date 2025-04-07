@@ -15,7 +15,7 @@ class KillerSudokuGenerator(private val maxToClear: Int,
      * Randomly clear no more than [maxToClear] cells without violating the unique solution condition
      * @param board board where cells must be cleared
      */
-    private fun clearCells(board: KillerSudokuBoard) {
+    private suspend fun clearCells(board: KillerSudokuBoard) {
         for (cell in (0 until board.size * board.size).shuffled()) {
             if (board.emptyCellsCount >= maxToClear) {
                 break
@@ -36,7 +36,7 @@ class KillerSudokuGenerator(private val maxToClear: Int,
      * Generate level of "Killer Sudoku" puzzle
      * @return generated level
      */
-    override fun generate() : KillerSudokuBoard {
+    override suspend fun generate() : KillerSudokuBoard {
         // Generate valid solution
         val board: KillerSudokuBoard = solutionGenerator.generateSolution()
         // Clear some cells

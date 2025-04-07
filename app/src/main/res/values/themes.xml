@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.Crowns" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -10,7 +10,40 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/dark_gray</item>
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.KillerSudoku" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/killer_sudoku</item>
+        <item name="colorPrimaryVariant">@color/killer_sudoku_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/killer_sudoku_light</item>
+        <item name="colorSecondaryVariant">@color/killer_sudoku</item>
+        <item name="colorOnSecondary">@color/black</item>
+    </style>
+
+    <style name="Theme.NQueens" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/n_queens</item>
+        <item name="colorPrimaryVariant">@color/n_queens_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/n_queens_light</item>
+        <item name="colorSecondaryVariant">@color/n_queens</item>
+        <item name="colorOnSecondary">@color/black</item>
+    </style>
+
+    <style name="Theme.Queens" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/queens_semi_dark</item>
+        <item name="colorPrimaryVariant">@color/queens_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/queens</item>
+        <item name="colorSecondaryVariant">@color/queens_semi_dark</item>
+        <item name="colorOnSecondary">@color/black</item>
     </style>
 </resources>

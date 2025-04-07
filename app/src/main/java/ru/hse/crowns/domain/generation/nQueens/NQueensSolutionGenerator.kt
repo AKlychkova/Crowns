@@ -8,5 +8,5 @@ interface NQueensSolutionGenerator {
      * @param boardSize n
      * @return generated board
      */
-    fun generateSolution(boardSize: Int) : NQueensBoard
+    suspend fun generateSolution(boardSize: Int) : NQueensBoard
 }

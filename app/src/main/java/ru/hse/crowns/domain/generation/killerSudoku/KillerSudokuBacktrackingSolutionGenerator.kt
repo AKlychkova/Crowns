@@ -10,7 +10,7 @@ class KillerSudokuBacktrackingSolutionGenerator : KillerSudokuSolutionGenerator 
     private val values = 1..boardSize
     private val boxesInRow = boardSize / boxSize
 
-    private val grid = Array<IntArray>(boardSize) { IntArray(boardSize) { 0 } }
+    private var grid = Array<IntArray>(boardSize) { IntArray(boardSize) { 0 } }
 
     /**
      * @return box id by cell coordinates
@@ -126,7 +126,8 @@ class KillerSudokuBacktrackingSolutionGenerator : KillerSudokuSolutionGenerator 
      * Generate a random valid solution to Killer Sudoku puzzle using a simple backtracking algorithm
      * @return generated board
      */
-    override fun generateSolution(): KillerSudokuBoard {
+    override suspend fun generateSolution(): KillerSudokuBoard {
+        grid = Array<IntArray>(boardSize) { IntArray(boardSize) { 0 } }
         fillDiagonal()
         fillNotDiagonal(getNextEmptyCell(0))
         return KillerSudokuBoard(grid)

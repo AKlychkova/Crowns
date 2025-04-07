@@ -12,7 +12,7 @@ class QueensGenerator(private val boardSize: Int,
      * Removes random queens without violating the unique solution condition
      * @param board board from which queens must be removed
      */
-    private fun removeQueens(board: QueensBoard) {
+    private suspend fun removeQueens(board: QueensBoard) {
         val solutionQueenPositions = board.getQueenPositions()
         // Go through the queens in random order
         for (queen in solutionQueenPositions.shuffled()) {
@@ -28,7 +28,7 @@ class QueensGenerator(private val boardSize: Int,
      * Generate level of "Queens" puzzle
      * @return generated level
      */
-    override fun generate(): QueensBoard {
+    override suspend fun generate(): QueensBoard {
         // Generate valid solution
         val board = solutionGenerator.generateSolution(boardSize)
         // Remove some queens

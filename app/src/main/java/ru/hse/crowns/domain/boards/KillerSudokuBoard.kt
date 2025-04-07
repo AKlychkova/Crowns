@@ -46,6 +46,9 @@ class KillerSudokuBoard(
      */
     private val polyominoDivision: Array<IntArray>
 
+    /**
+     * The list of observers
+     */
     private val observers = ArrayList<BoardObserver>()
 
     /**
