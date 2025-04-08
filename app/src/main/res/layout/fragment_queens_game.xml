@@ -32,9 +32,25 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/noteSwitch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/noteSwitch"
+        style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:showText="false"
+        app:thumbIcon="@drawable/pencil_black_24dp"
+        app:thumbIconTint="@color/thumb_icon_tint"
+        tools:checked="false" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
