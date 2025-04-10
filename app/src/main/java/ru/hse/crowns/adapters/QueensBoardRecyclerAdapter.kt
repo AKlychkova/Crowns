@@ -1,13 +1,16 @@
 package ru.hse.crowns.adapters
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import ru.hse.crowns.R
 import ru.hse.crowns.domain.boards.QueensBoard
 import ru.hse.crowns.databinding.BoardCellBinding
+import ru.hse.crowns.domain.boards.QueenCellStatus
 
 class QueensBoardRecyclerAdapter(
     private val onItemClick: (row: Int, column: Int) -> Unit
@@ -58,15 +61,41 @@ class QueensBoardRecyclerAdapter(
             R.drawable.ic_crown_black_24dp,
             null
         )
+        val crossDrawable = ResourcesCompat.getDrawable(
+            resources,
+            R.drawable.ic_cross_black_24dp,
+            null
+        )
         // Get description strings
         val queenString: String = holder.itemView.resources.getString(R.string.queen)
         val emptyString: String = holder.itemView.resources.getString(R.string.empty)
+        // Get color
+        val userColor: Color =
+            resources.getColor(R.color.user_values, null).toColor()
 
         // Set value
-        if (board.hasQueen(row, column)) {
-            holder.setValuePicture(queenDrawable, queenString)
-        } else {
-            holder.setValuePicture(null, emptyString)
+        when (board.getStatus(row, column)) {
+            QueenCellStatus.EMPTY -> holder.setValuePicture(
+                null,
+                emptyString,
+            )
+
+            QueenCellStatus.ORIGINAL_QUEEN -> holder.setValuePicture(
+                queenDrawable,
+                queenString
+            )
+
+            QueenCellStatus.USER_QUEEN -> holder.setValuePicture(
+                queenDrawable,
+                queenString,
+                userColor
+            )
+
+            QueenCellStatus.CROSS -> holder.setValuePicture(
+                crossDrawable,
+                queenString,
+                userColor
+            )
         }
 
         // Set polyomino color
@@ -90,7 +119,7 @@ class QueensBoardRecyclerAdapter(
 
             for (payload: Payload in payloads.mapNotNull { it as? Payload }) {
                 when (payload) {
-                    Payload.VALUE ->  {
+                    Payload.VALUE -> {
                         // Get itemView resources
                         val resources = holder.itemView.resources
                         // Get drawable value
@@ -99,15 +128,43 @@ class QueensBoardRecyclerAdapter(
                             R.drawable.ic_crown_black_24dp,
                             null
                         )
+                        val crossDrawable = ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.ic_cross_black_24dp,
+                            null
+                        )
                         // Get description strings
-                        val queenString: String = holder.itemView.resources.getString(R.string.queen)
-                        val emptyString: String = holder.itemView.resources.getString(R.string.empty)
+                        val queenString: String =
+                            holder.itemView.resources.getString(R.string.queen)
+                        val emptyString: String =
+                            holder.itemView.resources.getString(R.string.empty)
+                        // Get color
+                        val userColor: Color =
+                            resources.getColor(R.color.user_values, null).toColor()
 
                         // Set value
-                        if (board.hasQueen(row, column)) {
-                            holder.setValuePicture(queenDrawable, queenString)
-                        } else {
-                            holder.setValuePicture(null, emptyString)
+                        when (board.getStatus(row, column)) {
+                            QueenCellStatus.EMPTY -> holder.setValuePicture(
+                                null,
+                                emptyString,
+                            )
+
+                            QueenCellStatus.ORIGINAL_QUEEN -> holder.setValuePicture(
+                                queenDrawable,
+                                queenString
+                            )
+
+                            QueenCellStatus.USER_QUEEN -> holder.setValuePicture(
+                                queenDrawable,
+                                queenString,
+                                userColor
+                            )
+
+                            QueenCellStatus.CROSS -> holder.setValuePicture(
+                                crossDrawable,
+                                queenString,
+                                userColor
+                            )
                         }
                     }
 

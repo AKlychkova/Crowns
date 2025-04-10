@@ -27,7 +27,7 @@
         <item name="colorSecondaryVariant">@color/killer_sudoku</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurfaceContainerHighest">@color/killer_sudoku_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/white</item>
         <item name="colorPrimaryContainer">#9df2e8</item>
         <item name="colorOnPrimaryContainer">#00504a</item>
         <item name="colorOutline">#6f7977</item>
@@ -44,7 +44,7 @@
         <item name="colorSecondaryVariant">@color/n_queens</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurfaceContainerHighest">#ffe4ec</item>
+        <item name="colorSurfaceContainerHighest">@color/white</item>
         <item name="colorPrimaryContainer">#ffd9df</item>
         <item name="colorOutline">#847375</item>
         <item name="colorOnPrimaryContainer">#713342</item>
@@ -61,7 +61,7 @@
         <item name="colorSecondaryVariant">@color/queens_semi_dark</item>
         <item name="colorOnSecondary">@color/black</item>
 
-        <item name="colorSurfaceContainerHighest">@color/queens_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/white</item>
         <item name="colorPrimaryContainer">#fae287</item>
         <item name="colorOnPrimaryContainer">#544600</item>
         <item name="colorOutline">#7c7767</item>

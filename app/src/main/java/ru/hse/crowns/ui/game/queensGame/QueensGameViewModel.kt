@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import ru.hse.crowns.domain.boards.QueenCellStatus
 import ru.hse.crowns.domain.boards.QueensBoard
 import ru.hse.crowns.domain.generation.Generator
 
@@ -43,8 +44,18 @@ class QueensGameViewModel(
         }
     }
 
-    fun onCellClick(row: Int, column: Int) {
-        // TODO
-        boardLD.value?.removeQueen(row, column)
+    fun onCellClick(row: Int, column: Int, eraseMode: Boolean, noteMode: Boolean) {
+        val status = boardLD.value?.getStatus(row, column)
+        if (status != QueenCellStatus.ORIGINAL_QUEEN) {
+            if (eraseMode) {
+                boardLD.value?.clearCell(row, column)
+            } else if (noteMode && status != QueenCellStatus.CROSS) {
+                boardLD.value?.setCross(row, column)
+            } else if (!noteMode && status != QueenCellStatus.USER_QUEEN) {
+                boardLD.value?.addUserQueen(row, column)
+            } else {
+                boardLD.value?.clearCell(row, column)
+            }
+        }
     }
 }

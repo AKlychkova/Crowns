@@ -9,13 +9,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ru.hse.crowns.domain.boards.NQueensBoard
+import ru.hse.crowns.domain.boards.QueenCellStatus
 import ru.hse.crowns.domain.generation.Generator
 
-class NQueensGameViewModel (
+class NQueensGameViewModel(
     private val boardGenerator: Generator<NQueensBoard>
 ) : ViewModel() {
 
-    private val _boardLD = MutableLiveData <NQueensBoard>()
+    private val _boardLD = MutableLiveData<NQueensBoard>()
     val boardLD: LiveData<NQueensBoard> get() = _boardLD
 
     private val _isLoading = MutableLiveData<Boolean>()
@@ -28,7 +29,7 @@ class NQueensGameViewModel (
         generateJob?.cancel()
         generateJob = viewModelScope.launch(Dispatchers.Default) {
             val board = boardGenerator.generate()
-            if(isActive) {
+            if (isActive) {
                 launch(Dispatchers.Main) {
                     _boardLD.value = board
                     _isLoading.value = false
@@ -38,14 +39,24 @@ class NQueensGameViewModel (
     }
 
     fun updateBoard() {
-        if(!boardLD.isInitialized) {
+        if (!boardLD.isInitialized) {
             generateBoard()
         }
     }
 
-    fun onCellClick(row: Int, column: Int) {
-        // TODO
-        boardLD.value?.removeQueen(row, column)
+    fun onCellClick(row: Int, column: Int, eraseMode: Boolean, noteMode:Boolean) {
+        val status = boardLD.value?.getStatus(row, column)
+        if (status != QueenCellStatus.ORIGINAL_QUEEN) {
+            if (eraseMode) {
+                boardLD.value?.clearCell(row, column)
+            } else if (noteMode && status != QueenCellStatus.CROSS) {
+                boardLD.value?.setCross(row, column)
+            } else if (!noteMode && status != QueenCellStatus.USER_QUEEN) {
+                boardLD.value?.addUserQueen(row, column)
+            } else {
+                boardLD.value?.clearCell(row, column)
+            }
+        }
     }
 
 }

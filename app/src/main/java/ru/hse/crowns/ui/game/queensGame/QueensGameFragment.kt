@@ -33,13 +33,18 @@ class QueensGameFragment : Fragment() {
 
         // define recycler view
         binding.board.recyclerView.layoutManager = object : GridLayoutManager(context, boardSize) {
-            override fun canScrollVertically() : Boolean {
+            override fun canScrollVertically(): Boolean {
                 return false
             }
         }
 
         boardAdapter = QueensBoardRecyclerAdapter { row, column ->
-            viewModel.onCellClick(row, column)
+            viewModel.onCellClick(
+                row,
+                column,
+                binding.eraseToggleButton.isChecked,
+                !binding.noteSwitch.isChecked
+            )
         }
         binding.board.recyclerView.adapter = boardAdapter
 
@@ -50,7 +55,7 @@ class QueensGameFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.isLoading.observe(viewLifecycleOwner) {
-            if(it) {
+            if (it) {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.content.visibility = View.GONE
             } else {

@@ -18,7 +18,7 @@ class NQueensGenerator(
         // Go through the queens in random order
         for (queen in solutionQueenPositions.shuffled()) {
             // Remove the queen if it does not violate the uniqueness condition
-            board.removeQueen(queen.first, queen.second)
+            board.clearCell(queen.first, queen.second)
             if (!uniqueChecker.check(board)) {
                 board.addQueen(queen.first, queen.second)
             }

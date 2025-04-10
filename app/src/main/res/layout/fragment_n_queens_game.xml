@@ -12,7 +12,7 @@
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="board" />
+        app:constraint_referenced_ids="noteSwitch,eraseToggleButton,board" />
 
 
     <ProgressBar
@@ -25,6 +25,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/noteSwitch"
+        style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:checked="true"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:showText="false"
+        app:thumbIcon="@drawable/n_queens_thumb_icon"
+        app:thumbIconTint="@color/thumb_icon_tint" />
+
+    <ToggleButton
+        android:id="@+id/eraseToggleButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_eraser_black_24dp"
+        android:backgroundTint="@color/toggle_button_background_tint"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toBottomOf="@+id/noteSwitch"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@+id/noteSwitch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/noteSwitch" />
+
     <include
         android:id="@+id/board"
         layout="@layout/grid_board"
@@ -36,21 +66,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/noteSwitch"
-        style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:scaleX="1.5"
-        android:scaleY="1.5"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:showText="false"
-        app:thumbIcon="@drawable/pencil_black_24dp"
-        app:thumbIconTint="@color/thumb_icon_tint"
-        tools:checked="false" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

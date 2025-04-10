@@ -42,8 +42,23 @@ class KillerSudokuGameViewModel(
         }
     }
 
-    fun onCellClick(row: Int, column: Int) {
-        // TODO
-        boardLD.value?.clearCell(row, column)
+    fun onCellClick(row: Int, column: Int, value:Int, eraseMode:Boolean, noteMode: Boolean) {
+        if (boardLD.value?.isOriginal(row, column) == false) {
+            if (eraseMode) {
+                boardLD.value?.clearCell(row, column)
+            } else if (!noteMode) {
+                if(boardLD.value?.getValue(row, column) != value) {
+                    boardLD.value?.fillCellUser(row, column, value)
+                } else {
+                    boardLD.value?.clearCell(row, column)
+                }
+            } else {
+                if(boardLD.value?.containNote(row, column, value) == true) {
+                    boardLD.value?.removeNote(row, column, value)
+                } else if (boardLD.value?.isEmpty(row, column) == true){
+                    boardLD.value?.addNote(row, column, value)
+                }
+            }
+        }
     }
 }

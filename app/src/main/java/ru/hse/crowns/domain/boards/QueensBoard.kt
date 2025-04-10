@@ -11,6 +11,18 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
     private val queenPositions: MutableSet<Pair<Int, Int>> = queenPositions.toHashSet()
 
     /**
+     * A 2D array which hold cells' statuses
+     */
+    private val cellStatuses = Array(size) { row: Int ->
+        Array(size) { column: Int ->
+            if (Pair(row, column) in queenPositions)
+                QueenCellStatus.ORIGINAL_QUEEN
+            else
+                QueenCellStatus.EMPTY
+        }
+    }
+
+    /**
      * Index corresponds to the polyomino id.
      * Each value is a list of coordinates of the elements included in the corresponding polyomino.
      */
@@ -42,31 +54,66 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
     )
 
     /**
-     * Removes queen from cell with coordinates ([row], [column]).
+     * Clear the cell with coordinates ([row], [column]).
      * If cell is empty, nothing happens.
      * @throws IndexOutOfBoundsException if row or column are out of board bounds
      */
-    fun removeQueen(row: Int, column: Int) {
+    fun clearCell(row: Int, column: Int) {
         if (row !in 0 until size ||
             column !in 0 until size
         ) {
             throw IndexOutOfBoundsException()
         }
         queenPositions.remove(Pair(row, column))
+        cellStatuses[row][column] = QueenCellStatus.EMPTY
         notifyObservers(row, column)
     }
 
     /**
      * Add queen to cell with coordinates ([row], [column]) **without** checking the game rules.
+     * The queen will be considered 'original', to add 'user' queen use [addUserQueen] function.
      * @throws IndexOutOfBoundsException if row or column are out of board bounds
      */
     fun addQueen(row: Int, column: Int) {
         if (row in 0 until size && column in 0 until size) {
             queenPositions.add(Pair(row, column))
+            cellStatuses[row][column] = QueenCellStatus.ORIGINAL_QUEEN
             notifyObservers(row, column)
         } else {
             throw IndexOutOfBoundsException()
         }
+    }
+
+    /**
+     * Add user queen to cell with coordinates ([row], [column]) **without** checking the game rules.
+     * @throws IndexOutOfBoundsException if row or column are out of board bounds
+     */
+    fun addUserQueen(row: Int, column: Int) {
+        if (row !in 0 until size ||
+            column !in 0 until size
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        queenPositions.add(Pair(row, column))
+        cellStatuses[row][column] = QueenCellStatus.USER_QUEEN
+        notifyObservers(row, column)
+    }
+
+    /**
+     * Mark the cell with cross.
+     * @throws IndexOutOfBoundsException if row or column are out of board bounds
+     */
+    fun setCross(row: Int, column: Int) {
+        if (row !in 0 until size ||
+            column !in 0 until size
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        if (hasQueen(row, column)) {
+            queenPositions.remove(Pair(row, column))
+        }
+        cellStatuses[row][column] = QueenCellStatus.CROSS
+        notifyObservers(row, column)
     }
 
     /**
@@ -169,6 +216,22 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
      * @param column column of the cell
      */
     fun hasQueen(row: Int, column: Int): Boolean = Pair(row, column) in queenPositions
+
+    /**
+     * @return status of the cell
+     * @param row row of the cell
+     * @param column column of the cell
+     * @throws IndexOutOfBoundsException if row or column are out of board bounds
+     */
+    fun getStatus(row: Int, column: Int): QueenCellStatus {
+        if (row !in 0 until size ||
+            column !in 0 until size
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        return cellStatuses[row][column]
+    }
+
 
     override fun addObserver(observer: BoardObserver) {
         observers.add(observer)

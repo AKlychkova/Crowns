@@ -1,8 +1,14 @@
 package ru.hse.crowns.domain.boards
 
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
+/**
+ * @param sudokuGrid a 2D array contains 'original' values of the board cells.
+ * @property sudokuGrid a 2D array contains values of the board cells.
+ * Values are positive if they are 'original', negative if they are 'user', 0 for empty cells.
+ */
 class KillerSudokuBoard(
     private val sudokuGrid: Array<IntArray>
 ) : ObservableBoard {
@@ -47,6 +53,11 @@ class KillerSudokuBoard(
     private val polyominoDivision: Array<IntArray>
 
     /**
+     * A 2D array contains lists of notes values for each cell.
+     */
+    private val notes = Array<Array<MutableSet<Int>>>(size) { Array(size) { HashSet() } }
+
+    /**
      * The list of observers
      */
     private val observers = ArrayList<BoardObserver>()
@@ -76,23 +87,25 @@ class KillerSudokuBoard(
      * @throws IndexOutOfBoundsException if row or col are out of the board bounds
      */
     fun clearCell(row: Int, col: Int) {
-        if (row in sudokuGrid.indices &&
-            col in sudokuGrid.indices
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
         ) {
+            throw IndexOutOfBoundsException()
+        }
+        if (!isEmpty(row, col)) {
             emptyCellsCount += 1
             sudokuGrid[row][col] = 0
-            notifyObservers(row, col)
-        } else {
-            throw IndexOutOfBoundsException()
+            clearNotes(row, col)
+            // claerNotes has already called notifyObservers()
         }
     }
 
     /**
      * Fill ([row], [col]) cell with the [value].
+     * The value will be considered 'original', to add 'user' value use [fillCellUser] function.
      * @throws IndexOutOfBoundsException if row or col are out of the board bounds
      * @throws IllegalArgumentException if value is not valid
      * @throws IllegalArgumentException if cell is not empty
-     *
      */
     fun fillCell(row: Int, col: Int, value: Int) {
         if (row !in sudokuGrid.indices ||
@@ -112,6 +125,45 @@ class KillerSudokuBoard(
     }
 
     /**
+     * Fill ([row], [col]) cell with the [value], which will be considered 'user'.
+     * Value can replace another 'user' value, but not the original one.
+     * All notes will be removed.
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     * @throws IllegalArgumentException if value is not valid
+     * @throws IllegalArgumentException if there is an 'original' value in the cell cell
+     */
+    fun fillCellUser(row: Int, col: Int, value: Int) {
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        if (value !in values) {
+            throw IllegalArgumentException("Value is not valid.")
+        }
+        if (isOriginal(row, col)) {
+            throw IllegalArgumentException("Cell contains 'original' value.")
+        }
+        clearNotes(row, col)
+        emptyCellsCount -= 1
+        sudokuGrid[row][col] = -value
+        notifyObservers(row, col)
+    }
+
+    /**
+     * @return true if the cell in ([row], [col]) contains 'original' value, false otherwise
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     */
+    fun isOriginal(row: Int, col: Int): Boolean {
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        return !isEmpty(row, col) && sudokuGrid[row][col] > 0
+    }
+
+    /**
      * @return index of a box by cell coordinates ([row], [col])
      */
     fun getBoxId(row: Int, col: Int): Int {
@@ -125,10 +177,11 @@ class KillerSudokuBoard(
     }
 
     /**
-     * @return a 2D array contained cells' values
+     * @return a 2D array contained cells' values.
+     * There is not difference between 'original' and 'user' values.
      */
     fun getSudokuGrid(): Array<IntArray> {
-        return Array(size) { i: Int -> sudokuGrid[i].clone() }
+        return Array(size) { i: Int -> sudokuGrid[i].map { value: Int -> abs(value) }.toIntArray() }
     }
 
     /**
@@ -141,7 +194,10 @@ class KillerSudokuBoard(
         ) {
             throw IndexOutOfBoundsException()
         }
-        return if (!isEmpty(row, col)) sudokuGrid[row][col] else null
+        return if (!isEmpty(row, col))
+            abs(sudokuGrid[row][col])
+        else
+            null
     }
 
     /**
@@ -179,7 +235,7 @@ class KillerSudokuBoard(
                 if (neighbourRow in 0 until size &&
                     neighbourCol in 0 until size &&
                     division[neighbourRow][neighbourCol] != -1 &&
-                    !polyominoValues[division[neighbourRow][neighbourCol]].contains(sudokuGrid[row][col])
+                    !polyominoValues[division[neighbourRow][neighbourCol]].contains(abs(sudokuGrid[row][col]))
                 ) {
                     possiblePolyomino.add(division[neighbourRow][neighbourCol])
                 }
@@ -188,12 +244,12 @@ class KillerSudokuBoard(
             // Randomly assign one of possible polyomino ids to the cell
             division[row][col] = possiblePolyomino.random()
             if (division[row][col] < polyominoValues.size) {
-                polyominoValues[division[row][col]].add(sudokuGrid[row][col])
-                polyominoSum[division[row][col]] += sudokuGrid[row][col]
+                polyominoValues[division[row][col]].add(abs(sudokuGrid[row][col]))
+                polyominoSum[division[row][col]] += abs(sudokuGrid[row][col])
                 polyominoCoordinates[division[row][col]].add(Pair(row, col))
             } else {
-                polyominoValues.add(mutableSetOf(sudokuGrid[row][col]))
-                polyominoSum.add(sudokuGrid[row][col])
+                polyominoValues.add(mutableSetOf(abs(sudokuGrid[row][col])))
+                polyominoSum.add(abs(sudokuGrid[row][col]))
                 polyominoCoordinates.add(arrayListOf(Pair(row, col)))
             }
         }
@@ -228,7 +284,7 @@ class KillerSudokuBoard(
 
     /**
      * @return coordinates of elemnts included in polyomino with [polyominoId],
-     * empyt list if [polyominoId] does not correspond to any of existing polyominoes
+     * empty list if [polyominoId] does not correspond to any of existing polyominoes
      */
     fun getPolyominoCoordinates(polyominoId: Int): List<Pair<Int, Int>> {
         return if (polyominoId in 0 until getPolyominoCount()) {
@@ -240,15 +296,102 @@ class KillerSudokuBoard(
 
     /**
      * @return true if the cell in ([row], [col]) is empty (does not contain valid value), false otherwise
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
      */
     fun isEmpty(row: Int, col: Int): Boolean {
         return if (row in 0 until size &&
             col in 0 until size
         ) {
-            sudokuGrid[row][col] !in values
+            abs(sudokuGrid[row][col]) !in values
         } else {
             throw IndexOutOfBoundsException()
         }
+    }
+
+    /**
+     * Add note to the ([row], [col]) cell with [value]
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     * @throws IllegalArgumentException if value is not valid
+     * @throws IllegalArgumentException if cell is not empty
+     */
+    fun addNote(row: Int, col: Int, value: Int) {
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        if (value !in values) {
+            throw IllegalArgumentException("Value is not valid.")
+        }
+        if (!isEmpty(row, col)) {
+            throw IllegalArgumentException("Cell is not empty.")
+        }
+        notes[row][col].add(value)
+        notifyObservers(row, col)
+    }
+
+    /**
+     * Remove note with [value] from the ([row], [col]) cell if it is there,
+     * otherwise nothing happens
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     * @throws IllegalArgumentException if value is not valid
+     */
+    fun removeNote(row: Int, col: Int, value: Int) {
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        if (value !in values) {
+            throw IllegalArgumentException("Value is not valid.")
+        }
+        if(notes[row][col].remove(value)) {
+            notifyObservers(row, col)
+        }
+    }
+
+    /**
+     * Remove all notes from the ([row], [col]) cell and notify observers.
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     */
+    fun clearNotes(row: Int, col: Int) {
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        notes[row][col].clear()
+        notifyObservers(row, col)
+    }
+
+    /**
+     * @return set of all notes in the ([row], [col]) cell
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     */
+    fun getNotes(row: Int, col: Int): Set<Int> {
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        return notes[row][col].toSet()
+    }
+
+    /**
+     * @return true if there is note with [value] in the ([row], [col]) cell, else false
+     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     * @throws IllegalArgumentException if value is not valid
+     */
+    fun containNote(row: Int, col: Int, value: Int) : Boolean {
+        if (row !in sudokuGrid.indices ||
+            col !in sudokuGrid.indices
+        ) {
+            throw IndexOutOfBoundsException()
+        }
+        if (value !in values) {
+            throw IllegalArgumentException("Value is not valid.")
+        }
+        return notes[row][col].contains(value)
     }
 
     override fun addObserver(observer: BoardObserver) {
@@ -260,7 +403,7 @@ class KillerSudokuBoard(
     }
 
     override fun notifyObservers(row: Int, column: Int) {
-        for(observer: BoardObserver in observers) {
+        for (observer: BoardObserver in observers) {
             observer.onChanged(row, column)
         }
     }

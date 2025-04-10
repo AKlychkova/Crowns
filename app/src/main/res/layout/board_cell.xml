@@ -20,15 +20,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+    </androidx.cardview.widget.CardView>
 
     <ImageView
         android:id="@+id/valueImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="8dp"
-        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,5 +45,170 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="24" />
+
+    <TextView
+        android:id="@+id/noteTextView1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toTopOf="@+id/noteTextView4"
+        app:layout_constraintEnd_toStartOf="@+id/noteTextView2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/additionalInfoTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="1" />
+
+    <TextView
+        android:id="@+id/noteTextView2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toTopOf="@+id/noteTextView5"
+        app:layout_constraintEnd_toStartOf="@+id/noteTextView3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/noteTextView1"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="2" />
+
+    <TextView
+        android:id="@+id/noteTextView3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toTopOf="@+id/noteTextView6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/noteTextView2"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="3" />
+
+    <TextView
+        android:id="@+id/noteTextView4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toTopOf="@+id/noteTextView7"
+        app:layout_constraintEnd_toStartOf="@+id/noteTextView5"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/additionalInfoTextView"
+        app:layout_constraintTop_toBottomOf="@+id/noteTextView1"
+        tools:text="4" />
+
+    <TextView
+        android:id="@+id/noteTextView5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toTopOf="@+id/noteTextView8"
+        app:layout_constraintEnd_toStartOf="@+id/noteTextView6"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/noteTextView4"
+        app:layout_constraintTop_toBottomOf="@+id/noteTextView2"
+        tools:text="5" />
+
+    <TextView
+        android:id="@+id/noteTextView6"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toTopOf="@+id/noteTextView9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/noteTextView5"
+        app:layout_constraintTop_toBottomOf="@+id/noteTextView3"
+        tools:text="6" />
+
+    <TextView
+        android:id="@+id/noteTextView7"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginBottom="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toBottomOf="@id/valueImageView"
+        app:layout_constraintEnd_toStartOf="@+id/noteTextView8"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/additionalInfoTextView"
+        app:layout_constraintTop_toBottomOf="@+id/noteTextView4"
+        tools:text="7" />
+
+    <TextView
+        android:id="@+id/noteTextView8"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toBottomOf="@id/valueImageView"
+        app:layout_constraintEnd_toStartOf="@+id/noteTextView9"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/noteTextView7"
+        app:layout_constraintTop_toBottomOf="@+id/noteTextView5"
+        tools:text="8" />
+
+    <TextView
+        android:id="@+id/noteTextView9"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp"
+        android:autoSizeMaxTextSize="11sp"
+        android:autoSizeMinTextSize="1sp"
+        android:autoSizeStepGranularity="1px"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textColor="@color/user_values"
+        app:layout_constraintBottom_toBottomOf="@id/valueImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/noteTextView8"
+        app:layout_constraintTop_toBottomOf="@+id/noteTextView6"
+        tools:text="9" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

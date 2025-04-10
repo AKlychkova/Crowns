@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import ru.hse.crowns.databinding.FragmentKillerSudokuGameBinding
 import org.koin.core.parameter.parametersOf
+import ru.hse.crowns.R
 import ru.hse.crowns.adapters.KillerSudokuBoardRecyclerAdapter
 import ru.hse.crowns.domain.boards.BoardObserver
 import ru.hse.crowns.utils.KillerSudokuDifficultyLevel
@@ -41,13 +42,34 @@ class KillerSudokuGameFragment() : Fragment() {
         }
 
         boardAdapter = KillerSudokuBoardRecyclerAdapter({ row, column ->
-            viewModel.onCellClick(row, column)
+            viewModel.onCellClick(
+                row,
+                column,
+                getCurrentValue(),
+                binding.eraseToggleButton.isChecked,
+                !binding.noteSwitch.isChecked)
         })
         binding.board.recyclerView.adapter = boardAdapter
 
         observeViewModel()
 
         return binding.root
+    }
+
+    private fun getCurrentValue(): Int {
+        return when(binding.valueRadioGroup.checkedRadioButtonId) {
+            R.id.radioButton1 -> 1
+            R.id.radioButton2 -> 2
+            R.id.radioButton3 -> 3
+            R.id.radioButton4 -> 4
+            R.id.radioButton5 -> 5
+            R.id.radioButton6 -> 6
+            R.id.radioButton7 -> 7
+            R.id.radioButton8 -> 8
+            R.id.radioButton9 -> 9
+            // unreachable
+            else -> 0
+        }
     }
 
     private fun observeViewModel() {

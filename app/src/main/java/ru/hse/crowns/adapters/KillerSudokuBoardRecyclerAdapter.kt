@@ -2,8 +2,10 @@ package ru.hse.crowns.adapters
 
 import android.annotation.SuppressLint
 import android.content.res.TypedArray
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import ru.hse.crowns.R
 import ru.hse.crowns.domain.boards.KillerSudokuBoard
@@ -23,7 +25,8 @@ class KillerSudokuBoardRecyclerAdapter(
         POLYOMINO,
         ADDITIONAL_INFO,
         BORDERS,
-        LISTENER
+        LISTENER,
+        NOTES
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -37,6 +40,7 @@ class KillerSudokuBoardRecyclerAdapter(
      */
     fun updateCellValue(row: Int, column: Int) {
         notifyItemChanged(row * board.size + column, Payload.VALUE)
+        notifyItemChanged(row * board.size + column, Payload.NOTES)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoardCellViewHolder {
@@ -75,6 +79,11 @@ class KillerSudokuBoardRecyclerAdapter(
             },
             value?.toString() ?: emptyString
         )
+
+        holder.clearNotes()
+        for(note in board.getNotes(row, column)) {
+            holder.setNote(note.toString(), note - 1)
+        }
 
         // Set polyomino color
         holder.setPolyominoColor(polyominoId)
@@ -128,9 +137,13 @@ class KillerSudokuBoardRecyclerAdapter(
                         // Get array of drawable numbers
                         val numbersDrawables: TypedArray =
                             resources.obtainTypedArray(R.array.numbers_drawable)
-
+                        // Get value or null if cell is empty
                         val value: Int? = board.getValue(row, column)
+                        // Get description strings
                         val emptyString: String = resources.getString(R.string.empty)
+                        // Get color
+                        val userColor: Color =
+                            resources.getColor(R.color.user_values, null).toColor()
 
                         // Set value
                         holder.setValuePicture(
@@ -139,7 +152,12 @@ class KillerSudokuBoardRecyclerAdapter(
                             } else {
                                 null
                             },
-                            value?.toString() ?: emptyString
+                            value?.toString() ?: emptyString,
+                            if(!board.isOriginal(row, column)) {
+                                userColor
+                            } else {
+                                null
+                            }
                         )
 
                         numbersDrawables.recycle()
@@ -180,6 +198,13 @@ class KillerSudokuBoardRecyclerAdapter(
                     Payload.LISTENER -> {
                         holder.itemView.setOnClickListener {
                             onItemClick(row, column)
+                        }
+                    }
+
+                    Payload.NOTES -> {
+                        holder.clearNotes()
+                        for(note in board.getNotes(row, column)) {
+                            holder.setNote(note.toString(), note - 1)
                         }
                     }
                 }
