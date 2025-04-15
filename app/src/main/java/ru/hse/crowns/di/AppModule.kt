@@ -1,9 +1,8 @@
 package ru.hse.crowns.di
 
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import ru.hse.crowns.data.repositories.BalanceRepository
 import ru.hse.crowns.domain.boards.KillerSudokuBoard
 import ru.hse.crowns.domain.boards.NQueensBoard
 import ru.hse.crowns.domain.boards.QueensBoard
@@ -23,12 +22,12 @@ import ru.hse.crowns.domain.generation.queens.QueensBacktrackingSolutionGenerato
 import ru.hse.crowns.domain.generation.queens.QueensGenerator
 import ru.hse.crowns.domain.generation.queens.QueensSolutionGenerator
 import ru.hse.crowns.domain.generation.queens.QueensUniqueChecker
-import ru.hse.crowns.ui.game.killerSudokuGame.KillerSudokuGameViewModel
-import ru.hse.crowns.ui.game.nQueensGame.NQueensGameViewModel
-import ru.hse.crowns.ui.game.queensGame.QueensGameViewModel
-import ru.hse.crowns.ui.home.killerSudokuHome.KillerSudokuHomeViewModel
-import ru.hse.crowns.ui.home.nQueensHome.NQueensHomeViewModel
-import ru.hse.crowns.ui.home.queensHome.QueensHomeViewModel
+import ru.hse.crowns.domain.validation.KillerSudokuValidator
+import ru.hse.crowns.domain.validation.KillerSudokuValidatorImpl
+import ru.hse.crowns.domain.validation.NQueensValidator
+import ru.hse.crowns.domain.validation.NQueensValidatorImpl
+import ru.hse.crowns.domain.validation.QueensValidator
+import ru.hse.crowns.domain.validation.QueensValidatorImpl
 
 val appModule = module {
     single<KillerSudokuUniqueChecker> { KillerSudokuDLUniqueChecker() }
@@ -40,6 +39,7 @@ val appModule = module {
             get()
         )
     }
+    single<KillerSudokuValidator> { KillerSudokuValidatorImpl() }
 
     single<NQueensUniqueChecker> { NQueensDLUniqueChecker() }
     single<NQueensSolutionGenerator> { NQueensBacktrackingSolutionGenerator() }
@@ -50,6 +50,7 @@ val appModule = module {
             get()
         )
     }
+    single<NQueensValidator> { NQueensValidatorImpl() }
 
     single<QueensUniqueChecker> { QueensDLUniqueChecker() }
     single<QueensSolutionGenerator> { QueensBacktrackingSolutionGenerator() }
@@ -60,29 +61,7 @@ val appModule = module {
             get()
         )
     }
+    single<QueensValidator> { QueensValidatorImpl() }
 
-    viewModel { (maxToClear: Int) ->
-        KillerSudokuGameViewModel(get(named<KillerSudokuBoard>()) {
-            parametersOf(
-                maxToClear
-            )
-        })
-    }
-    viewModel { (boardSize: Int) ->
-        NQueensGameViewModel(get(named<NQueensBoard>()) {
-            parametersOf(
-                boardSize
-            )
-        })
-    }
-    viewModel { (boardSize: Int) ->
-        QueensGameViewModel(get((named<QueensBoard>())) {
-            parametersOf(
-                boardSize
-            )
-        })
-    }
-    viewModel { KillerSudokuHomeViewModel() }
-    viewModel { NQueensHomeViewModel() }
-    viewModel { QueensHomeViewModel() }
+    single<BalanceRepository> { BalanceRepository(get()) }
 }

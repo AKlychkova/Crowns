@@ -23,4 +23,8 @@
     <string name="ten">10</string>
     <string name="coins">Монетки</string>
     <string name="hints">Подсказки</string>
+    <string name="win">Вы выиграли!</string>
+    <string name="prize">Ваш выйгрыш: %1$d монет</string>
+    <string name="new_level">Новый уровень</string>
+    <string name="menu">Меню</string>
 </resources>

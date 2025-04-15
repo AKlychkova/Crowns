@@ -1,20 +1,25 @@
-package ru.hse.crowns
+package ru.hse.crowns.ui.host
 
+import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import ru.hse.crowns.databinding.ActivityMainBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.hse.crowns.R
+import ru.hse.crowns.databinding.ActivityHostBinding
 
-class MainActivity : AppCompatActivity() {
+class HostActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityHostBinding
+    private val viewModel : HostViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityHostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Set up navigation between home screens
@@ -62,5 +67,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.coinsBalance.observe(this) {
+            binding.coinBalanceTextView.text = it.toString()
+        }
     }
+
+
 }

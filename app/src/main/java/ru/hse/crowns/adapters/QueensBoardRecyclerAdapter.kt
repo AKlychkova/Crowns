@@ -17,6 +17,7 @@ class QueensBoardRecyclerAdapter(
 ) : RecyclerView.Adapter<BoardCellViewHolder>() {
 
     private lateinit var board: QueensBoard
+    private var currentMistakes = emptySet<Int>()
 
     /**
      * Allows not to bind all itemView but change only a part of it
@@ -24,7 +25,9 @@ class QueensBoardRecyclerAdapter(
     private enum class Payload {
         VALUE,
         POLYOMINO,
-        LISTENER
+        LISTENER,
+        ADD_MISTAKE,
+        REMOVE_MISTAKE
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -40,6 +43,17 @@ class QueensBoardRecyclerAdapter(
         notifyItemChanged(row * board.size + column, Payload.VALUE)
     }
 
+    fun updateMistakes(positions: Iterable<Pair<Int, Int>>) {
+        val mistakes = positions.map { it.first * board.size + it.second}.toSet()
+        for (position in (mistakes - currentMistakes)) {
+            notifyItemChanged(position, Payload.ADD_MISTAKE)
+        }
+        for (position in (currentMistakes - mistakes)) {
+            notifyItemChanged(position, Payload.REMOVE_MISTAKE)
+        }
+        currentMistakes = mistakes
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoardCellViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = BoardCellBinding.inflate(layoutInflater, parent, false)
@@ -49,62 +63,11 @@ class QueensBoardRecyclerAdapter(
     override fun getItemCount(): Int = board.size * board.size
 
     override fun onBindViewHolder(holder: BoardCellViewHolder, position: Int) {
-        val row = position / board.size
-        val column = position % board.size
-        val polyominoId = board.getPolyomino(row, column)
-
-        // Get itemView resources
-        val resources = holder.itemView.resources
-        // Get drawable value
-        val queenDrawable = ResourcesCompat.getDrawable(
-            resources,
-            R.drawable.ic_crown_black_24dp,
-            null
-        )
-        val crossDrawable = ResourcesCompat.getDrawable(
-            resources,
-            R.drawable.ic_cross_black_24dp,
-            null
-        )
-        // Get description strings
-        val queenString: String = holder.itemView.resources.getString(R.string.queen)
-        val emptyString: String = holder.itemView.resources.getString(R.string.empty)
-        // Get color
-        val userColor: Color =
-            resources.getColor(R.color.user_values, null).toColor()
-
-        // Set value
-        when (board.getStatus(row, column)) {
-            QueenCellStatus.EMPTY -> holder.setValuePicture(
-                null,
-                emptyString,
-            )
-
-            QueenCellStatus.ORIGINAL_QUEEN -> holder.setValuePicture(
-                queenDrawable,
-                queenString
-            )
-
-            QueenCellStatus.USER_QUEEN -> holder.setValuePicture(
-                queenDrawable,
-                queenString,
-                userColor
-            )
-
-            QueenCellStatus.CROSS -> holder.setValuePicture(
-                crossDrawable,
-                queenString,
-                userColor
-            )
-        }
-
-        // Set polyomino color
-        holder.setPolyominoColor(polyominoId)
-
-        // Set listener
-        holder.itemView.setOnClickListener {
-            onItemClick(row, column)
-        }
+        onBindViewHolder(holder, position, mutableListOf(
+            Payload.VALUE,
+            Payload.POLYOMINO,
+            Payload.LISTENER,
+            if(position in currentMistakes) Payload.ADD_MISTAKE else Payload.REMOVE_MISTAKE))
     }
 
     override fun onBindViewHolder(
@@ -179,6 +142,9 @@ class QueensBoardRecyclerAdapter(
                             onItemClick(row, column)
                         }
                     }
+
+                    Payload.ADD_MISTAKE -> holder.setMistakeColor()
+                    Payload.REMOVE_MISTAKE -> holder.removeMistakeColor()
                 }
             }
         } else {

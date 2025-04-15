@@ -16,6 +16,7 @@ class KillerSudokuBoardRecyclerAdapter(
 ) : RecyclerView.Adapter<BoardCellViewHolder>() {
 
     private lateinit var board: KillerSudokuBoard
+    private var currentMistakes = emptySet<Int>()
 
     /**
      * Allows not to bind all itemView but change only a part of it
@@ -26,7 +27,9 @@ class KillerSudokuBoardRecyclerAdapter(
         ADDITIONAL_INFO,
         BORDERS,
         LISTENER,
-        NOTES
+        NOTES,
+        ADD_MISTAKE,
+        REMOVE_MISTAKE,
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -41,6 +44,17 @@ class KillerSudokuBoardRecyclerAdapter(
     fun updateCellValue(row: Int, column: Int) {
         notifyItemChanged(row * board.size + column, Payload.VALUE)
         notifyItemChanged(row * board.size + column, Payload.NOTES)
+    }
+
+    fun updateMistakes(positions: Iterable<Pair<Int, Int>>) {
+        val mistakes = positions.map { it.first * board.size + it.second}.toSet()
+        for (position in (mistakes - currentMistakes)) {
+            notifyItemChanged(position, Payload.ADD_MISTAKE)
+        }
+        for (position in (currentMistakes - mistakes)) {
+            notifyItemChanged(position, Payload.REMOVE_MISTAKE)
+        }
+        currentMistakes = mistakes
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoardCellViewHolder {
@@ -58,64 +72,14 @@ class KillerSudokuBoardRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: BoardCellViewHolder, position: Int) {
-        // Get itemView resources
-        val resources = holder.itemView.resources
-
-        // Get array of drawable numbers
-        val numbersDrawables: TypedArray = resources.obtainTypedArray(R.array.numbers_drawable)
-
-        val row = position / board.size
-        val column = position % board.size
-        val value: Int? = board.getValue(row, column)
-        val polyominoId = board.getPolyomino(row, column)
-        val emptyString: String = resources.getString(R.string.empty)
-
-        // Set value
-        holder.setValuePicture(
-            if (value != null) {
-                numbersDrawables.getDrawable(value - 1)
-            } else {
-                null
-            },
-            value?.toString() ?: emptyString
-        )
-
-        holder.clearNotes()
-        for(note in board.getNotes(row, column)) {
-            holder.setNote(note.toString(), note - 1)
-        }
-
-        // Set polyomino color
-        holder.setPolyominoColor(polyominoId)
-
-        // If cell has the smallest coordinates in its polyomino,
-        // write polyomino total as additional information
-
-        // Get smallest coordinates in the polyomino
-        val minCoordinates = board.getPolyominoCoordinates(polyominoId)
-            .minWithOrNull(compareBy({ it.first }, { it.second }))
-
-        if (row == minCoordinates?.first && column == minCoordinates.second) {
-            holder.setAdditionalInfo(board.getSum(polyominoId).toString())
-        }
-
-        if (row % board.boxSize == 0) {
-            holder.makeTopBorderBold()
-        }
-        if (row % board.boxSize == board.boxSize - 1) {
-            holder.makeBottomBorderBold()
-        }
-        if (column % board.boxSize == 0) {
-            holder.makeLeftBorderBold()
-        }
-        if (column % board.boxSize == board.boxSize - 1) {
-            holder.makeRightBorderBold()
-        }
-        numbersDrawables.recycle()
-
-        holder.itemView.setOnClickListener {
-            onItemClick(row, column)
-        }
+        onBindViewHolder(holder, position, mutableListOf(
+            Payload.VALUE,
+            Payload.POLYOMINO,
+            Payload.ADDITIONAL_INFO,
+            Payload.BORDERS,
+            Payload.LISTENER,
+            Payload.NOTES,
+            if(position in currentMistakes) Payload.ADD_MISTAKE else Payload.REMOVE_MISTAKE))
     }
 
     override fun onBindViewHolder(
@@ -207,6 +171,9 @@ class KillerSudokuBoardRecyclerAdapter(
                             holder.setNote(note.toString(), note - 1)
                         }
                     }
+
+                    Payload.ADD_MISTAKE -> holder.setMistakeColor()
+                    Payload.REMOVE_MISTAKE -> holder.removeMistakeColor()
                 }
             }
         } else {

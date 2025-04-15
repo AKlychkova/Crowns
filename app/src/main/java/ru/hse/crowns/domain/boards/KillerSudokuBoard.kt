@@ -1,5 +1,6 @@
 package ru.hse.crowns.domain.boards
 
+import kotlinx.coroutines.yield
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -173,6 +174,24 @@ class KillerSudokuBoard(
             row / boxSize * boxesInRow + col / boxSize
         } else {
             throw IndexOutOfBoundsException()
+        }
+    }
+
+    /**
+     * @return Sequence of values in the box
+     * @param boxId id of the box
+     * @throws IndexOutOfBoundsException if boxId is out of the bounds
+     */
+    fun getBox(boxId:Int) = sequence<Int>{
+        if (boxId !in 0 until boxesInRow * boxesInRow) {
+            throw IndexOutOfBoundsException()
+        }
+        val row: Int = boxId / boxesInRow * boxSize
+        val column: Int = boxId % boxesInRow * boxSize
+        for (i in 0 until boxSize) {
+            for(j in 0 until boxSize) {
+                yield(abs(sudokuGrid[row + i][column + j]))
+            }
         }
     }
 
@@ -379,7 +398,7 @@ class KillerSudokuBoard(
 
     /**
      * @return true if there is note with [value] in the ([row], [col]) cell, else false
-     * @throws IndexOutOfBoundsException if row or col are out of the board bounds
+     * @throws IndexOutOfBoundsException if [row] or [col] are out of the board bounds
      * @throws IllegalArgumentException if value is not valid
      */
     fun containNote(row: Int, col: Int, value: Int) : Boolean {
@@ -392,6 +411,34 @@ class KillerSudokuBoard(
             throw IllegalArgumentException("Value is not valid.")
         }
         return notes[row][col].contains(value)
+    }
+
+    /**
+     * @return [List] with row values
+     * @param rowIndex index of the row
+     * @throws IndexOutOfBoundsException if [rowIndex] is out of the board bounds
+     */
+    fun getRow(rowIndex: Int): List<Int> {
+        if (rowIndex !in sudokuGrid.indices) {
+            throw IndexOutOfBoundsException()
+        }
+        return sudokuGrid[rowIndex].map { value: Int -> abs(value) }
+    }
+
+    /**
+     * @return [List] with column values
+     * @param columnIndex index of the column
+     * @throws IndexOutOfBoundsException if [columnIndex] is out of the board bounds
+     */
+    fun getColumn(columnIndex: Int): List<Int> {
+        if (columnIndex !in sudokuGrid.indices) {
+            throw IndexOutOfBoundsException()
+        }
+        val column = ArrayList<Int>(size)
+        for (i in 0 until size) {
+            column.add(abs(sudokuGrid[i][columnIndex]))
+        }
+        return column
     }
 
     override fun addObserver(observer: BoardObserver) {

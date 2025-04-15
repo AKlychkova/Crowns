@@ -211,6 +211,13 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
     }
 
     /**
+     * @return number of polyomino into which the board is divided
+     */
+    fun getPolyominoCount(): Int {
+        return polyominoCoordinates.size
+    }
+
+    /**
      * @return true if there is a queen in the cell else false
      * @param row row of the cell
      * @param column column of the cell

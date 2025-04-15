@@ -10,12 +10,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import ru.hse.crowns.ui.host.HostActivity
 
 @RunWith(AndroidJUnit4::class)
 class NavigationBarTest {
     @Rule
     @JvmField
-    var activityRule = ActivityScenarioRule(MainActivity::class.java)
+    var activityRule = ActivityScenarioRule(HostActivity::class.java)
 
     @Test
     fun clickNQueensTab() {

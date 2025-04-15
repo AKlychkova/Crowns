@@ -3,6 +3,7 @@ package ru.hse.crowns.adapters
 import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
 import androidx.core.graphics.toColorInt
@@ -121,5 +122,13 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         for(textView in noteTextViews) {
             textView.text = null
         }
+    }
+
+    fun setMistakeColor() {
+        binding.mistakeView.visibility = View.VISIBLE
+    }
+
+    fun removeMistakeColor() {
+        binding.mistakeView.visibility = View.GONE
     }
 }
