@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_package = "ru.hse.crowns.proto";
+option java_multiple_files = true;
+
+message KillerSudokuGameDTO {
+  int64 time = 1;
+  int32 mistakeCount = 2;
+  int32 hintCount = 3;
+  int32 level = 4;
+
+  message Cell {
+    int32 row = 1;
+    int32 column = 2;
+    int32 value = 3;
+    int32 polyominoId = 4;
+    repeated int32 notes = 5;
+  }
+  repeated int32 polyominoSums = 5;
+  repeated Cell cells = 6;
+}

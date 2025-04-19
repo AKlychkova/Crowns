@@ -50,7 +50,28 @@ class QueensHomeFragment : Fragment() {
             view.findNavController()
                 .navigate(R.id.action_navigation_queens_to_queensGameFragment, bundle)
         }
+
+        binding.resumeQueensButton.setOnClickListener { view ->
+            val bundle = Bundle()
+            bundle.putBoolean("fromDataStore", true)
+            bundle.putInt("boardSize", viewModel.dataBoardSize!!)
+            view.findNavController()
+                .navigate(R.id.action_navigation_queens_to_queensGameFragment, bundle)
+        }
+
+        viewModel.hasGameData.observe(viewLifecycleOwner) {
+            if(it) {
+                binding.resumeQueensButton.visibility = View.VISIBLE
+            } else {
+                binding.resumeQueensButton.visibility = View.INVISIBLE
+            }
+        }
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.checkGameData()
     }
 
     override fun onDestroyView() {

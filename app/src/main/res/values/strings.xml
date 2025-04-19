@@ -27,4 +27,5 @@
     <string name="prize">Ваш выйгрыш: %1$d монет</string>
     <string name="new_level">Новый уровень</string>
     <string name="menu">Меню</string>
+    <string name="resume_game">Продолжить игру</string>
 </resources>

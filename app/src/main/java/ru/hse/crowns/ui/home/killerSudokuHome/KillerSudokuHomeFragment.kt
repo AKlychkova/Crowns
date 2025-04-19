@@ -43,7 +43,27 @@ class KillerSudokuHomeFragment : Fragment() {
                 .navigate(R.id.action_navigation_killer_sudoku_to_killerSudokuGameFragment, bundle)
         }
 
+        binding.resumeKillerSudokuButton.setOnClickListener { view ->
+            val bundle = Bundle()
+            bundle.putBoolean("fromDataStore", true)
+            bundle.putInt("difficultyLevel", viewModel.dataBoardLevel!!)
+            view.findNavController()
+                .navigate(R.id.action_navigation_killer_sudoku_to_killerSudokuGameFragment, bundle)
+        }
+
+        viewModel.hasGameData.observe(viewLifecycleOwner) {
+            if(it) {
+                binding.resumeKillerSudokuButton.visibility = View.VISIBLE
+            } else {
+                binding.resumeKillerSudokuButton.visibility = View.INVISIBLE
+            }
+        }
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.checkGameData()
     }
 
     override fun onDestroyView() {

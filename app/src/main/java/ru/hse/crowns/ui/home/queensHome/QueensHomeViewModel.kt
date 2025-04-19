@@ -3,11 +3,29 @@ package ru.hse.crowns.ui.home.queensHome
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ru.hse.crowns.domain.mappers.QueensMapper
 
-class QueensHomeViewModel : ViewModel() {
+class QueensHomeViewModel(private val gameDataMapper: QueensMapper) : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is dashboard Fragment"
+    private val _hasGameData = MutableLiveData<Boolean>()
+    val hasGameData: LiveData<Boolean> = _hasGameData
+
+    var dataBoardSize: Int? = null
+        private set
+
+    fun checkGameData() = viewModelScope.launch(Dispatchers.IO) {
+        val hasData = gameDataMapper.hasData()
+        launch(Dispatchers.Main) {
+            _hasGameData.value = hasData
+        }
+        if (hasData) {
+            val size = gameDataMapper.getBoardSize()
+            launch(Dispatchers.Main) {
+                dataBoardSize = size
+            }
+        }
     }
-    val text: LiveData<String> = _text
 }

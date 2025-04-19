@@ -58,6 +58,10 @@
         <argument
             android:name="difficultyLevel"
             app:argType="integer" />
+        <argument
+            android:name="fromDataStore"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/NQueensGameFragment"
@@ -70,7 +74,12 @@
             app:argType="boolean" />
         <argument
             android:name="boardSize"
-            app:argType="integer" />
+            app:argType="integer"
+            android:defaultValue="0"/>
+        <argument
+            android:name="fromDataStore"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/queensGameFragment"
@@ -84,5 +93,9 @@
         <argument
             android:name="boardSize"
             app:argType="integer" />
+        <argument
+            android:name="fromDataStore"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 </navigation>

@@ -34,7 +34,7 @@ class NQueensGameFragment : Fragment() {
         _binding = FragmentNQueensGameBinding.inflate(inflater, container, false)
 
         // define viewmodel
-        val boardSize: Int = arguments?.getInt("boardSize") ?: 8
+        val boardSize: Int = requireArguments().getInt("boardSize")
         viewModel = getViewModel { parametersOf(boardSize) }
 
         // define recycler view
@@ -91,7 +91,6 @@ class NQueensGameFragment : Fragment() {
             }
             if (it is GameStatus.Win) {
                 binding.chronometer.stop()
-                val time = ((SystemClock.elapsedRealtime() - binding.chronometer.base) / 60_000).toInt()
                 WinDialogFragment(viewModel.calculatePrize()
                 ) { _, which: Int ->
                     when (which) {
@@ -113,7 +112,7 @@ class NQueensGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.updateBoard()
+        viewModel.updateBoard(requireArguments().getBoolean("fromDataStore"))
     }
 
     private fun startChronometer() {
@@ -134,6 +133,13 @@ class NQueensGameFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         stopChronometer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if(viewModel.status.value != GameStatus.Win) {
+            viewModel.cache()
+        }
     }
 
     override fun onDestroyView() {

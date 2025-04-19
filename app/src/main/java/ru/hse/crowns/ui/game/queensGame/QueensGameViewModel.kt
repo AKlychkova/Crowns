@@ -1,18 +1,22 @@
 package ru.hse.crowns.ui.game.queensGame
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.hse.crowns.data.repositories.BalanceRepository
 import ru.hse.crowns.domain.PrizeCalculator
 import ru.hse.crowns.domain.boards.QueenCellStatus
 import ru.hse.crowns.domain.boards.QueensBoard
 import ru.hse.crowns.domain.generation.Generator
+import ru.hse.crowns.domain.mappers.QueensMapper
 import ru.hse.crowns.domain.validation.GameStatus
 import ru.hse.crowns.domain.validation.QueensMistake
 import ru.hse.crowns.domain.validation.QueensValidator
@@ -20,7 +24,8 @@ import ru.hse.crowns.domain.validation.QueensValidator
 class QueensGameViewModel(
     private val boardGenerator: Generator<QueensBoard>,
     private val boardValidator: QueensValidator,
-    private val balanceRepository: BalanceRepository
+    private val balanceRepository: BalanceRepository,
+    private val gameDataMapper: QueensMapper
 ) : ViewModel() {
 
     private val _boardLD = MutableLiveData<QueensBoard>()
@@ -43,12 +48,12 @@ class QueensGameViewModel(
      */
     var time: Long = 0
 
-    private var generateJob: Job? = null
+    private var getBoardJob: Job? = null
 
     private fun generateBoard() {
         _isLoading.value = true
-        generateJob?.cancel()
-        generateJob = viewModelScope.launch(Dispatchers.Default) {
+        getBoardJob?.cancel()
+        getBoardJob = viewModelScope.launch(Dispatchers.Default) {
             val board = boardGenerator.generate()
             if (isActive) {
                 launch(Dispatchers.Main) {
@@ -59,9 +64,32 @@ class QueensGameViewModel(
         }
     }
 
-    fun updateBoard() {
+    private fun readFromDataStore() {
+        _isLoading.value = true
+        getBoardJob?.cancel()
+        getBoardJob = viewModelScope.launch(Dispatchers.Default) {
+            val board = gameDataMapper.getBoard()
+            val data = gameDataMapper.getGameData()
+            if (isActive) {
+                launch(Dispatchers.Main) {
+                    _boardLD.value = board
+                    _hintCounter.value = data.hintCount
+                    _mistakeCounter.value = data.mistakeCount
+                    _status.value = boardValidator.check(board) ?: GameStatus.Neutral
+                    time = data.time
+                    _isLoading.value = false
+                }
+            }
+        }
+    }
+
+    fun updateBoard(fromDataStore: Boolean) {
         if (!boardLD.isInitialized) {
-            generateBoard()
+            if(fromDataStore) {
+                readFromDataStore()
+            } else {
+                generateBoard()
+            }
         }
     }
 
@@ -86,10 +114,15 @@ class QueensGameViewModel(
                 _status.value = mistake!!
             } else if (board.getQueensCount() == board.size) {
                 _status.value = GameStatus.Win
+                clearCache()
             } else {
                 _status.value = GameStatus.Neutral
             }
         }
+    }
+
+    private fun clearCache() = viewModelScope.launch(Dispatchers.IO){
+        gameDataMapper.removeData()
     }
 
     fun calculatePrize(): Int {
@@ -112,5 +145,17 @@ class QueensGameViewModel(
         _mistakeCounter.value = 0
         _status.value = GameStatus.Neutral
         generateBoard()
+    }
+
+    fun cache() = viewModelScope.launch(Dispatchers.Default) {
+        withContext(NonCancellable) {
+            gameDataMapper.saveGameData(
+                board = boardLD.value!!,
+                time = time,
+                hintCount = hintCounter.value!!,
+                mistakeCount = mistakeCounter.value!!
+            )
+            Log.d("save", "queens data saved")
+        }
     }
 }

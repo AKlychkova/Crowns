@@ -135,7 +135,7 @@ class KillerSudokuGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.updateBoard()
+        viewModel.updateBoard(requireArguments().getBoolean("fromDataStore"))
     }
 
     private fun startChronometer() {
@@ -158,9 +158,11 @@ class KillerSudokuGameFragment : Fragment() {
         stopChronometer()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        // TODO Save game state
-        super.onSaveInstanceState(outState)
+    override fun onStop() {
+        if(viewModel.status.value != GameStatus.Win) {
+            viewModel.cache(requireArguments().getInt("difficultyLevel"))
+        }
+        super.onStop()
     }
 
     override fun onDestroyView() {

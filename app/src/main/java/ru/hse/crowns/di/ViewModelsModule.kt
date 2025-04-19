@@ -18,39 +18,42 @@ import ru.hse.crowns.ui.host.HostViewModel
 val viewModelsModule = module {
     viewModel { (maxToClear: Int) ->
         KillerSudokuGameViewModel(
-            get(named<KillerSudokuBoard>()) {
+            boardGenerator = get(named<KillerSudokuBoard>()) {
                 parametersOf(
                     maxToClear
                 )
             },
-            get(),
-            get()
+            boardValidator = get(),
+            balanceRepository = get(),
+            gameDataMapper = get()
         )
     }
     viewModel { (boardSize: Int) ->
         NQueensGameViewModel(
-            get(named<NQueensBoard>()) {
+            boardGenerator = get(named<NQueensBoard>()) {
                 parametersOf(
                     boardSize
                 )
             },
-            get(),
-            get()
+            boardValidator = get(),
+            balanceRepository = get(),
+            gameDataMapper = get()
         )
     }
     viewModel { (boardSize: Int) ->
         QueensGameViewModel(
-            get((named<QueensBoard>())) {
+            boardGenerator = get((named<QueensBoard>())) {
                 parametersOf(
                     boardSize
                 )
             },
-            get(),
-            get()
+            boardValidator = get(),
+            balanceRepository = get(),
+            gameDataMapper = get()
         )
     }
-    viewModel { KillerSudokuHomeViewModel() }
-    viewModel { NQueensHomeViewModel() }
-    viewModel { QueensHomeViewModel() }
+    viewModel { KillerSudokuHomeViewModel(get()) }
+    viewModel { NQueensHomeViewModel(get()) }
+    viewModel { QueensHomeViewModel(get()) }
     viewModel { HostViewModel(get()) }
 }

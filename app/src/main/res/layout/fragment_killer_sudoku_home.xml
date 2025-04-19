@@ -9,11 +9,22 @@
 
     <Button
         android:id="@+id/startKillerSudokuButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:text="@string/start_game"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/resumeKillerSudokuButton"
+        app:layout_constraintStart_toStartOf="@+id/resumeKillerSudokuButton" />
+
+    <Button
+        android:id="@+id/resumeKillerSudokuButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/resume_game"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/startKillerSudokuButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

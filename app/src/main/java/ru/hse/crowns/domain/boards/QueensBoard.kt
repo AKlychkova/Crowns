@@ -3,12 +3,20 @@ package ru.hse.crowns.domain.boards
 /**
  * @property size board dimension
  * @property queenPositions queens coordinates
+ * @property polyominoDivision a 2D array stores the polyomino id for each cell
  */
-class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : ObservableBoard {
+class QueensBoard(
+    val size: Int,
+    queenPositions: Collection<Pair<Int, Int>>,
+    polyominoDivision: Array<IntArray>?
+) : ObservableBoard {
+
     /**
      * Set of queens coordinates
      */
-    private val queenPositions: MutableSet<Pair<Int, Int>> = queenPositions.toHashSet()
+    private val queenPositions: MutableSet<Pair<Int, Int>> = queenPositions.filter { position ->
+        position.first in 0 until size && position.second in 0 until size
+    }.toHashSet()
 
     /**
      * A 2D array which hold cells' statuses
@@ -26,7 +34,7 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
      * Index corresponds to the polyomino id.
      * Each value is a list of coordinates of the elements included in the corresponding polyomino.
      */
-    private val polyominoCoordinates = Array(queenPositions.size) { ArrayList<Pair<Int, Int>>() }
+    private val polyominoCoordinates = Array(size) { ArrayList<Pair<Int, Int>>() }
 
     /**
      * Stores the polyomino id for each cell
@@ -39,9 +47,26 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
     private val observers = ArrayList<BoardObserver>()
 
     init {
-        // randomly divide the board into polyominoes
-        polyominoDivision = generatePolyominoDivision()
+        if (polyominoDivision != null &&
+            polyominoDivision.size == size &&
+            polyominoDivision.all { row -> row.size == size && row.all { id -> id in 0 until size } }
+        ) {
+            this.polyominoDivision = polyominoDivision
+            for ((rowIndex, row) in polyominoDivision.withIndex()) {
+                for ((columnIndex, id) in row.withIndex()) {
+                    polyominoCoordinates[id].add(Pair(rowIndex, columnIndex))
+                }
+            }
+        } else {
+            this.polyominoDivision = generatePolyominoDivision()
+        }
     }
+
+    constructor(size: Int, queenPositions: Collection<Pair<Int, Int>>) : this(
+        size = size,
+        queenPositions = queenPositions,
+        polyominoDivision = null
+    )
 
     /**
      * @param queenPositions an array in which each pair (index, value) corresponds to the coordinates of the queen (row, column)
@@ -175,7 +200,9 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
             }
             // Put random free neighbour to polyomino of the current cell
             val newCell = neighbourCells.random()
-            division[newCell.first][newCell.second] = division[currentCell.first][currentCell.second]
+            division[newCell.first][newCell.second] =
+                division[currentCell.first][currentCell.second]
+            polyominoCoordinates[division[newCell.first][newCell.second]].add(newCell)
             // If current cell is not boundary now, remove it from the set
             if (neighbourCells.size == 1) {
                 boundaryCells.remove(currentCell)
@@ -249,7 +276,7 @@ class QueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : O
     }
 
     override fun notifyObservers(row: Int, column: Int) {
-        for(observer: BoardObserver in observers) {
+        for (observer: BoardObserver in observers) {
             observer.onChanged(row, column)
         }
     }

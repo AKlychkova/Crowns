@@ -68,7 +68,7 @@ class QueensGameFragment : Fragment() {
             } else {
                 binding.progressBar.visibility = View.GONE
                 binding.content.visibility = View.VISIBLE
-                stopChronometer()
+                startChronometer()
             }
         }
 
@@ -91,7 +91,6 @@ class QueensGameFragment : Fragment() {
             }
             if (it is GameStatus.Win) {
                 binding.chronometer.stop()
-                val time = ((SystemClock.elapsedRealtime() - binding.chronometer.base) / 60_000).toInt()
                 WinDialogFragment(viewModel.calculatePrize()
                 ) { _, which: Int ->
                     when (which) {
@@ -113,7 +112,7 @@ class QueensGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.updateBoard()
+        viewModel.updateBoard(requireArguments().getBoolean("fromDataStore"))
     }
 
     private fun startChronometer() {
@@ -134,6 +133,13 @@ class QueensGameFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         stopChronometer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if(viewModel.status.value != GameStatus.Win) {
+            viewModel.cache()
+        }
     }
 
     override fun onDestroyView() {

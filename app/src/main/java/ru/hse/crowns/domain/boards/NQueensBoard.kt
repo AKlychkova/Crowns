@@ -8,7 +8,9 @@ class NQueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : 
     /**
      * Set of coordinates of all queens that are currently on the board
      */
-    private var queenPositions: MutableSet<Pair<Int, Int>> = queenPositions.toHashSet()
+    private var queenPositions: MutableSet<Pair<Int, Int>> = queenPositions.filter{ position ->
+        position.first in 0 until size && position.second in 0 until size
+    }.toHashSet()
 
     /**
      * A 2D array which hold cells' statuses

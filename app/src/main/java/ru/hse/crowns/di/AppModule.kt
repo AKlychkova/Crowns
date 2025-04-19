@@ -1,8 +1,12 @@
 package ru.hse.crowns.di
 
+import androidx.datastore.preferences.core.Preferences
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import ru.hse.crowns.data.repositories.BalanceRepository
+import ru.hse.crowns.data.repositories.KillerSudokuGameRepository
+import ru.hse.crowns.data.repositories.NQueensGameRepository
+import ru.hse.crowns.data.repositories.QueensGameRepository
 import ru.hse.crowns.domain.boards.KillerSudokuBoard
 import ru.hse.crowns.domain.boards.NQueensBoard
 import ru.hse.crowns.domain.boards.QueensBoard
@@ -22,12 +26,18 @@ import ru.hse.crowns.domain.generation.queens.QueensBacktrackingSolutionGenerato
 import ru.hse.crowns.domain.generation.queens.QueensGenerator
 import ru.hse.crowns.domain.generation.queens.QueensSolutionGenerator
 import ru.hse.crowns.domain.generation.queens.QueensUniqueChecker
+import ru.hse.crowns.domain.mappers.KillerSudokuMapper
+import ru.hse.crowns.domain.mappers.NQueensMapper
+import ru.hse.crowns.domain.mappers.QueensMapper
 import ru.hse.crowns.domain.validation.KillerSudokuValidator
 import ru.hse.crowns.domain.validation.KillerSudokuValidatorImpl
 import ru.hse.crowns.domain.validation.NQueensValidator
 import ru.hse.crowns.domain.validation.NQueensValidatorImpl
 import ru.hse.crowns.domain.validation.QueensValidator
 import ru.hse.crowns.domain.validation.QueensValidatorImpl
+import ru.hse.crowns.proto.KillerSudokuGameDTO
+import ru.hse.crowns.proto.NQueensGameDTO
+import ru.hse.crowns.proto.QueensGameDTO
 
 val appModule = module {
     single<KillerSudokuUniqueChecker> { KillerSudokuDLUniqueChecker() }
@@ -63,5 +73,12 @@ val appModule = module {
     }
     single<QueensValidator> { QueensValidatorImpl() }
 
-    single<BalanceRepository> { BalanceRepository(get()) }
+    single<BalanceRepository> { BalanceRepository(get(named<Preferences>())) }
+    single<NQueensGameRepository> { NQueensGameRepository(get(named<NQueensGameDTO>())) }
+    single<QueensGameRepository> { QueensGameRepository(get(named<QueensGameDTO>())) }
+    single<KillerSudokuGameRepository> { KillerSudokuGameRepository(get(named<KillerSudokuGameDTO>())) }
+
+    single<NQueensMapper> { NQueensMapper(get()) }
+    single<QueensMapper> { QueensMapper(get()) }
+    single<KillerSudokuMapper> { KillerSudokuMapper(get()) }
 }

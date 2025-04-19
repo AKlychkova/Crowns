@@ -1,17 +1,17 @@
 package ru.hse.crowns.domain.boards
 
-import kotlinx.coroutines.yield
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 /**
- * @param sudokuGrid a 2D array contains 'original' values of the board cells.
  * @property sudokuGrid a 2D array contains values of the board cells.
  * Values are positive if they are 'original', negative if they are 'user', 0 for empty cells.
  */
-class KillerSudokuBoard(
-    private val sudokuGrid: Array<IntArray>
+class KillerSudokuBoard internal constructor(
+    private val sudokuGrid: Array<IntArray>,
+    polyominoDivision: Array<IntArray>?,
+    polyominoSum: IntArray?
 ) : ObservableBoard {
     var emptyCellsCount: Int = 0
         private set
@@ -40,13 +40,13 @@ class KillerSudokuBoard(
      * Index corresponds to the polyomino id.
      * Value corresponds to the sum of the elements included in the corresponding polyomino.
      */
-    private val polyominoSum = ArrayList<Int>()
+    private var polyominoSum: MutableList<Int> = ArrayList<Int>()
 
     /**
      * Index corresponds to the polyomino id.
      * Each value is a list of coordinates of the elements included in the corresponding polyomino.
      */
-    private val polyominoCoordinates = ArrayList<ArrayList<Pair<Int, Int>>>()
+    private var polyominoCoordinates: MutableList<MutableList<Pair<Int, Int>>> = ArrayList()
 
     /**
      * Stores the polyomino id for each cell
@@ -73,15 +73,35 @@ class KillerSudokuBoard(
     init {
         // check if all values are valid
         for (i in sudokuGrid.indices) {
-            for (j in sudokuGrid[i].indices) {
-                if (sudokuGrid[i][j] !in values) {
+            for ( j in sudokuGrid[i].indices) {
+                if (abs(sudokuGrid[i][j]) !in values && sudokuGrid[i][j] != 0) {
                     throw IllegalArgumentException()
+                } else if (sudokuGrid[i][j] == 0) {
+                    emptyCellsCount += 1
                 }
             }
         }
-        // randomly divide the board into polyominoes
-        polyominoDivision = generatePolyominoDivision()
+        // check division
+        if (polyominoDivision != null && polyominoSum != null) {
+            this.polyominoDivision = polyominoDivision
+            this.polyominoSum = polyominoSum.toMutableList()
+            val maxId = polyominoDivision.maxOf { row -> row.max() }
+            polyominoCoordinates = MutableList(maxId + 1) { ArrayList() }
+            for ((rowIndex, row) in polyominoDivision.withIndex()) {
+                for ((columnIndex, id) in row.withIndex()) {
+                    polyominoCoordinates[id].add(Pair(rowIndex, columnIndex))
+                }
+            }
+        } else {
+            if(emptyCellsCount != 0) {
+                throw IllegalArgumentException()
+            }
+            // randomly divide the board into polyominoes
+            this.polyominoDivision = generatePolyominoDivision()
+        }
     }
+
+    constructor(sudokuGrid: Array<IntArray>) : this(sudokuGrid, null, null)
 
     /**
      * Clear cell with the coordinates ([row], [col]).
@@ -96,9 +116,9 @@ class KillerSudokuBoard(
         if (!isEmpty(row, col)) {
             emptyCellsCount += 1
             sudokuGrid[row][col] = 0
-            clearNotes(row, col)
-            // claerNotes has already called notifyObservers()
         }
+        clearNotes(row, col)
+        // claerNotes has already called notifyObservers()
     }
 
     /**
@@ -182,14 +202,14 @@ class KillerSudokuBoard(
      * @param boxId id of the box
      * @throws IndexOutOfBoundsException if boxId is out of the bounds
      */
-    fun getBox(boxId:Int) = sequence<Int>{
+    fun getBox(boxId: Int) = sequence<Int> {
         if (boxId !in 0 until boxesInRow * boxesInRow) {
             throw IndexOutOfBoundsException()
         }
         val row: Int = boxId / boxesInRow * boxSize
         val column: Int = boxId % boxesInRow * boxSize
         for (i in 0 until boxSize) {
-            for(j in 0 until boxSize) {
+            for (j in 0 until boxSize) {
                 yield(abs(sudokuGrid[row + i][column + j]))
             }
         }
@@ -349,6 +369,12 @@ class KillerSudokuBoard(
         notifyObservers(row, col)
     }
 
+    fun addAllNotes(row: Int, col: Int, values: Iterable<Int>) {
+        for(value in values) {
+            addNote(row, col, value)
+        }
+    }
+
     /**
      * Remove note with [value] from the ([row], [col]) cell if it is there,
      * otherwise nothing happens
@@ -364,7 +390,7 @@ class KillerSudokuBoard(
         if (value !in values) {
             throw IllegalArgumentException("Value is not valid.")
         }
-        if(notes[row][col].remove(value)) {
+        if (notes[row][col].remove(value)) {
             notifyObservers(row, col)
         }
     }
@@ -401,7 +427,7 @@ class KillerSudokuBoard(
      * @throws IndexOutOfBoundsException if [row] or [col] are out of the board bounds
      * @throws IllegalArgumentException if value is not valid
      */
-    fun containNote(row: Int, col: Int, value: Int) : Boolean {
+    fun containNote(row: Int, col: Int, value: Int): Boolean {
         if (row !in sudokuGrid.indices ||
             col !in sudokuGrid.indices
         ) {

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_package = "ru.hse.crowns.proto";
+option java_multiple_files = true;
+
+message QueensGameDTO {
+  int64 time = 1;
+  int32 mistakeCount = 2;
+  int32 hintCount = 3;
+
+  enum CellStatus {
+    EMPTY = 0;
+    ORIGINAL_QUEEN = 1;
+    USER_QUEEN = 2;
+    CROSS = 3;
+  }
+
+  message Cell {
+    int32 row = 1;
+    int32 column = 2;
+    CellStatus status = 3;
+    int32 polyominoId = 4;
+  }
+
+  repeated Cell cells = 4;
+}
