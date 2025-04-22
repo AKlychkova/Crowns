@@ -1,6 +1,7 @@
 package ru.hse.crowns.ui.dialogs
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
@@ -21,5 +22,10 @@ class WinDialogFragment(private val prize: Int, private val onClickListener: OnC
                 .setNeutralButton(getString(R.string.menu), onClickListener)
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        onClickListener.onClick(dialog, DialogInterface.BUTTON_NEUTRAL)
+        super.onCancel(dialog)
     }
 }
