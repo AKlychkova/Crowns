@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.NQueens"
+    tools:context=".ui.home.nQueensHome.NQueensHomeFragment">
+
+    <Button
+        android:id="@+id/startNQueensButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="@string/start_game"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/resumeNQueensButton"
+        app:layout_constraintStart_toStartOf="@+id/resumeNQueensButton" />
+
+    <Button
+        android:id="@+id/resumeNQueensButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/resume_game"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/startNQueensButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/difficultyRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checkedButton="@id/fiveRadioButton"
+        android:theme="@style/Theme.NQueens"
+        app:layout_constraintBottom_toTopOf="@+id/startNQueensButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/fiveRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/five_by_five" />
+
+        <RadioButton
+            android:id="@+id/sixRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/six_by_six" />
+
+        <RadioButton
+            android:id="@+id/sevenRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/seven_by_seven" />
+
+        <RadioButton
+            android:id="@+id/eightRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/eight_by_eight" />
+
+        <RadioButton
+            android:id="@+id/nineRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nine_by_nine" />
+
+        <RadioButton
+            android:id="@+id/tenRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ten_by_ten" />
+    </RadioGroup>
+</androidx.constraintlayout.widget.ConstraintLayout>

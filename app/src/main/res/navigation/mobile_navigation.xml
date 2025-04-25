@@ -3,23 +3,101 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_queens">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="ru.hse.crowns.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_n_queens"
+        android:name="ru.hse.crowns.ui.home.nQueensHome.NQueensHomeFragment"
+        android:label="@string/title_n_queens"
+        tools:layout="@layout/fragment_n_queens_home">
+        <argument
+            android:name="ShowBottomBar"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_navigation_n_queens_to_NQueensGameFragment"
+            app:destination="@id/NQueensGameFragment" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="ru.hse.crowns.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_queens"
+        android:name="ru.hse.crowns.ui.home.queensHome.QueensHomeFragment"
+        android:label="@string/title_queens"
+        tools:layout="@layout/fragment_queens_home">
+        <argument
+            android:name="ShowBottomBar"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_navigation_queens_to_queensGameFragment"
+            app:destination="@id/queensGameFragment" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="ru.hse.crowns.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_killer_sudoku"
+        android:name="ru.hse.crowns.ui.home.killerSudokuHome.KillerSudokuHomeFragment"
+        android:label="@string/title_killer_sudoku"
+        tools:layout="@layout/fragment_killer_sudoku_home">
+        <argument
+            android:name="ShowBottomBar"
+            android:defaultValue="true"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_navigation_killer_sudoku_to_killerSudokuGameFragment"
+            app:destination="@id/killerSudokuGameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/killerSudokuGameFragment"
+        android:name="ru.hse.crowns.ui.game.killerSudokuGame.KillerSudokuGameFragment"
+        android:label="fragment_killer_sudoku_game"
+        tools:layout="@layout/fragment_killer_sudoku_game">
+        <argument
+            android:name="ShowBottomBar"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="difficultyLevel"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="fromDataStore"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/NQueensGameFragment"
+        android:name="ru.hse.crowns.ui.game.nQueensGame.NQueensGameFragment"
+        android:label="NQueensGameFragment"
+        tools:layout="@layout/fragment_n_queens_game">
+        <argument
+            android:name="ShowBottomBar"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="boardSize"
+            app:argType="integer"
+            android:defaultValue="5"/>
+        <argument
+            android:name="fromDataStore"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/queensGameFragment"
+        android:name="ru.hse.crowns.ui.game.queensGame.QueensGameFragment"
+        android:label="QueensGameFragment"
+        tools:layout="@layout/fragment_queens_game">
+        <argument
+            android:name="ShowBottomBar"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="boardSize"
+            app:argType="integer"
+            android:defaultValue="5" />
+        <argument
+            android:name="fromDataStore"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
 </navigation>
