@@ -10,12 +10,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import ru.hse.crowns.ui.host.HostActivity
 
 @RunWith(AndroidJUnit4::class)
 class NavigationBarTest {
     @Rule
     @JvmField
-    var activityRule = ActivityScenarioRule(MainActivity::class.java)
+    var activityRule = ActivityScenarioRule(HostActivity::class.java)
 
     @Test
     fun clickNQueensTab() {
@@ -25,7 +26,7 @@ class NavigationBarTest {
         onView(withId(R.id.navigation_n_queens))
             .perform(click())
 
-        onView(withId(R.id.text_home)).check(matches(isDisplayed()))
+        onView(withId(R.id.startNQueensButton)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -36,7 +37,7 @@ class NavigationBarTest {
         onView(withId(R.id.navigation_queens))
             .perform(click())
 
-        onView(withId(R.id.text_dashboard)).check(matches(isDisplayed()))
+        onView(withId(R.id.startQueensButton)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -47,6 +48,6 @@ class NavigationBarTest {
         onView(withId(R.id.navigation_killer_sudoku))
             .perform(click())
 
-        onView(withId(R.id.text_notifications)).check(matches(isDisplayed()))
+        onView(withId(R.id.startKillerSudokuButton)).check(matches(isDisplayed()))
     }
 }
