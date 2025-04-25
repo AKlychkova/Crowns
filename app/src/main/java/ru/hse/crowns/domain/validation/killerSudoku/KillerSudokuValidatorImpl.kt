@@ -1,8 +1,10 @@
-package ru.hse.crowns.domain.validation
+package ru.hse.crowns.domain.validation.killerSudoku
 
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.validation.gameStatuses.KillerSudokuMistake
+import ru.hse.crowns.utils.getPowerSet
 
-class KillerSudokuValidatorImpl: KillerSudokuValidator {
+class KillerSudokuValidatorImpl : KillerSudokuValidator {
     override fun check(board: KillerSudokuBoard): KillerSudokuMistake? {
         for (index in 0 until board.size) {
             val row = board.getRow(index)
@@ -51,18 +53,24 @@ class KillerSudokuValidatorImpl: KillerSudokuValidator {
 
         for (polyominoId in 0 until board.getPolyominoCount()) {
             var sum: Int = 0
-            var isFull = true
+            var free = 0
+            val polyominoValues = mutableListOf<Int>()
             for (coordinates in board.getPolyominoCoordinates(polyominoId)) {
                 val value: Int? = board.getValue(coordinates.first, coordinates.second)
                 if (value != null) {
                     sum += value
+                    polyominoValues.add(value)
                 } else {
-                    isFull = false
+                    free += 1
                 }
             }
-            if ((!isFull && sum >= board.getSum(polyominoId)) ||
-                (isFull && sum != board.getSum(polyominoId))
-            ) {
+            val notUsedValues: List<Int> = board.values.filter { it !in polyominoValues }
+            val possibleSums: List<Int> = notUsedValues
+                .toSet()
+                .getPowerSet()
+                .filter { it.size == free }
+                .map { it.sum() + sum }
+            if (board.getSum(polyominoId) !in possibleSums) {
                 return KillerSudokuMistake.IncorrectSum(
                     *board.getPolyominoCoordinates(polyominoId).toTypedArray()
                 )

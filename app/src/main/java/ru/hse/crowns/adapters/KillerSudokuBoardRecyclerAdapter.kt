@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import ru.hse.crowns.R
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
 import ru.hse.crowns.databinding.BoardCellBinding
 
 class KillerSudokuBoardRecyclerAdapter(
@@ -16,7 +16,8 @@ class KillerSudokuBoardRecyclerAdapter(
 ) : RecyclerView.Adapter<BoardCellViewHolder>() {
 
     private lateinit var board: KillerSudokuBoard
-    private var currentMistakes = emptySet<Int>()
+    private var currentRed = emptySet<Int>()
+    private var currentGreen = emptySet<Int>()
 
     /**
      * Allows not to bind all itemView but change only a part of it
@@ -28,8 +29,9 @@ class KillerSudokuBoardRecyclerAdapter(
         BORDERS,
         LISTENER,
         NOTES,
-        ADD_MISTAKE,
-        REMOVE_MISTAKE,
+        HIGHLIGHT_RED,
+        REMOVE_HIGHLIGHT,
+        HIGHLIGHT_GREEN
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -46,15 +48,25 @@ class KillerSudokuBoardRecyclerAdapter(
         notifyItemChanged(row * board.size + column, Payload.NOTES)
     }
 
-    fun updateMistakes(positions: Iterable<Pair<Int, Int>>) {
-        val mistakes = positions.map { it.first * board.size + it.second}.toSet()
-        for (position in (mistakes - currentMistakes)) {
-            notifyItemChanged(position, Payload.ADD_MISTAKE)
+    fun updateHighlights(greenPositions: Iterable<Pair<Int, Int>> = emptyList(),
+                         redPositions: Iterable<Pair<Int, Int>> = emptyList()) {
+        val green = greenPositions.map { it.first * board.size + it.second}.toSet()
+        for (position in (green - currentGreen)) {
+            notifyItemChanged(position, Payload.HIGHLIGHT_GREEN)
         }
-        for (position in (currentMistakes - mistakes)) {
-            notifyItemChanged(position, Payload.REMOVE_MISTAKE)
+        for (position in (currentGreen - green)) {
+            notifyItemChanged(position, Payload.REMOVE_HIGHLIGHT)
         }
-        currentMistakes = mistakes
+        currentGreen = green
+
+        val red = redPositions.map { it.first * board.size + it.second}.toSet()
+        for (position in (red - currentRed - currentGreen)) {
+            notifyItemChanged(position, Payload.HIGHLIGHT_RED)
+        }
+        for (position in (currentRed - red)) {
+            notifyItemChanged(position, Payload.REMOVE_HIGHLIGHT)
+        }
+        currentRed = red - currentGreen
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoardCellViewHolder {
@@ -79,7 +91,8 @@ class KillerSudokuBoardRecyclerAdapter(
             Payload.BORDERS,
             Payload.LISTENER,
             Payload.NOTES,
-            if(position in currentMistakes) Payload.ADD_MISTAKE else Payload.REMOVE_MISTAKE))
+            if(position in currentRed) Payload.HIGHLIGHT_RED else Payload.REMOVE_HIGHLIGHT,
+        if(position in currentGreen) Payload.HIGHLIGHT_GREEN else Payload.REMOVE_HIGHLIGHT))
     }
 
     override fun onBindViewHolder(
@@ -108,6 +121,8 @@ class KillerSudokuBoardRecyclerAdapter(
                         // Get color
                         val userColor: Color =
                             resources.getColor(R.color.user_values, null).toColor()
+                        val originalColor: Color =
+                            resources.getColor(R.color.original_values, null).toColor()
 
                         // Set value
                         holder.setValuePicture(
@@ -120,7 +135,7 @@ class KillerSudokuBoardRecyclerAdapter(
                             if(!board.isOriginal(row, column)) {
                                 userColor
                             } else {
-                                null
+                                originalColor
                             }
                         )
 
@@ -172,8 +187,9 @@ class KillerSudokuBoardRecyclerAdapter(
                         }
                     }
 
-                    Payload.ADD_MISTAKE -> holder.setMistakeColor()
-                    Payload.REMOVE_MISTAKE -> holder.removeMistakeColor()
+                    Payload.HIGHLIGHT_RED -> holder.highlightRed()
+                    Payload.REMOVE_HIGHLIGHT -> holder.removeHighlightColor()
+                    Payload.HIGHLIGHT_GREEN -> holder.highLightGreen()
                 }
             }
         } else {

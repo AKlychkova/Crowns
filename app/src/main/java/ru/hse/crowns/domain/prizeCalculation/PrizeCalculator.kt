@@ -1,4 +1,4 @@
-package ru.hse.crowns.domain
+package ru.hse.crowns.domain.prizeCalculation
 
 import kotlin.math.max
 

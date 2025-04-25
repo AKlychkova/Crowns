@@ -1,14 +1,19 @@
 package ru.hse.crowns.domain.mappers
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import ru.hse.crowns.data.repositories.KillerSudokuGameRepository
-import ru.hse.crowns.domain.GameData
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.domainObjects.GameCharacteristics
+import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
 import ru.hse.crowns.proto.KillerSudokuGameDTO
+import ru.hse.crowns.utils.KillerSudokuDifficultyLevel
 import kotlin.math.max
 
 class KillerSudokuMapper(private val repository: KillerSudokuGameRepository) {
+    val hasDataFlow: Flow<Boolean> = repository.gameFlow.map { it != null }
+
     private fun mapBoardToCells(board: KillerSudokuBoard): List<KillerSudokuGameDTO.Cell> {
         val list = ArrayList<KillerSudokuGameDTO.Cell>(board.size * board.size)
         for (i in 0 until board.size) {
@@ -74,27 +79,23 @@ class KillerSudokuMapper(private val repository: KillerSudokuGameRepository) {
         }
     }
 
-    suspend fun hasData(): Boolean {
-        return repository.getData() != null
-    }
-
     suspend fun getBoard(): KillerSudokuBoard {
         return mapBoard(
             withContext(Dispatchers.IO) {repository.getData()!!}
         )
     }
 
-    suspend fun getGameData(): GameData {
+    suspend fun getGameData(): GameCharacteristics {
         val game: KillerSudokuGameDTO = withContext(Dispatchers.IO) {repository.getData()!!}
-        return GameData(
+        return GameCharacteristics(
             time = game.time,
             hintCount = game.hintCount,
             mistakeCount = game.mistakeCount
         )
     }
 
-    suspend fun getLevel() : Int {
-        return repository.getData()!!.level
+    suspend fun getLevel() : KillerSudokuDifficultyLevel {
+        return KillerSudokuDifficultyLevel.entries[repository.getData()!!.level]
     }
 
     suspend fun removeData() {

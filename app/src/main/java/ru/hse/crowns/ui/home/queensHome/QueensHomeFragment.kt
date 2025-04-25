@@ -54,7 +54,6 @@ class QueensHomeFragment : Fragment() {
         binding.resumeQueensButton.setOnClickListener { view ->
             val bundle = Bundle()
             bundle.putBoolean("fromDataStore", true)
-            bundle.putInt("boardSize", viewModel.dataBoardSize!!)
             view.findNavController()
                 .navigate(R.id.action_navigation_queens_to_queensGameFragment, bundle)
         }
@@ -67,11 +66,6 @@ class QueensHomeFragment : Fragment() {
             }
         }
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.checkGameData()
     }
 
     override fun onDestroyView() {

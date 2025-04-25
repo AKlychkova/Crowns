@@ -1,4 +1,4 @@
-package ru.hse.crowns.domain.validation
+package ru.hse.crowns.domain.validation.gameStatuses
 
 sealed class GameStatus {
     data object Win : GameStatus()

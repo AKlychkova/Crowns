@@ -16,7 +16,7 @@ class WinDialogFragment(private val prize: Int, private val onClickListener: OnC
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
-            builder.setMessage(getString(R.string.win))
+            builder.setTitle(getString(R.string.win))
                 .setMessage(getString(R.string.prize, prize))
                 .setPositiveButton(getString(R.string.new_level), onClickListener)
                 .setNeutralButton(getString(R.string.menu), onClickListener)

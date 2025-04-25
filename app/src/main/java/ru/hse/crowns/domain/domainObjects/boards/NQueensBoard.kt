@@ -1,4 +1,6 @@
-package ru.hse.crowns.domain.boards
+package ru.hse.crowns.domain.domainObjects.boards
+
+import kotlin.math.abs
 
 /**
  * @property size board dimension
@@ -132,6 +134,59 @@ class NQueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : 
             throw IndexOutOfBoundsException()
         }
         return cellStatuses[row][column]
+    }
+
+    /**
+     * @return [List] with row statuses
+     * @param rowIndex index of the row
+     * @throws IndexOutOfBoundsException if [rowIndex] is out of the board bounds
+     */
+    fun getRow(rowIndex: Int): List<QueenCellStatus> {
+        if (rowIndex !in cellStatuses.indices) {
+            throw IndexOutOfBoundsException()
+        }
+        return cellStatuses[rowIndex].toList()
+    }
+
+    /**
+     * @return [List] with column statuses
+     * @param columnIndex index of the column
+     * @throws IndexOutOfBoundsException if [columnIndex] is out of the board bounds
+     */
+    fun getColumn(columnIndex: Int): List<QueenCellStatus> {
+        if (columnIndex !in cellStatuses.indices) {
+            throw IndexOutOfBoundsException()
+        }
+        val column = ArrayList<QueenCellStatus>(size)
+        for (i in 0 until size) {
+            column.add(cellStatuses[i][columnIndex])
+        }
+        return column
+    }
+
+    fun clone() : NQueensBoard {
+        val newBoard = NQueensBoard(size, emptyList())
+        for(row in 0 until size) {
+            for(col in 0 until size) {
+                when(cellStatuses[row][col]) {
+                    QueenCellStatus.EMPTY -> {}
+                    QueenCellStatus.ORIGINAL_QUEEN -> newBoard.addQueen(row, col)
+                    QueenCellStatus.USER_QUEEN -> newBoard.addUserQueen(row, col)
+                    QueenCellStatus.CROSS -> newBoard.setCross(row, col)
+                }
+            }
+        }
+        return newBoard
+    }
+
+    fun backToOriginal() {
+        for(i in 0 until size) {
+            for(j in 0 until size) {
+                if(cellStatuses[i][j] != QueenCellStatus.ORIGINAL_QUEEN) {
+                    clearCell(i, j)
+                }
+            }
+        }
     }
 
     override fun addObserver(observer: BoardObserver) {

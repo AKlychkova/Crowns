@@ -46,7 +46,6 @@ class KillerSudokuHomeFragment : Fragment() {
         binding.resumeKillerSudokuButton.setOnClickListener { view ->
             val bundle = Bundle()
             bundle.putBoolean("fromDataStore", true)
-            bundle.putInt("difficultyLevel", viewModel.dataBoardLevel!!)
             view.findNavController()
                 .navigate(R.id.action_navigation_killer_sudoku_to_killerSudokuGameFragment, bundle)
         }
@@ -59,11 +58,6 @@ class KillerSudokuHomeFragment : Fragment() {
             }
         }
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.checkGameData()
     }
 
     override fun onDestroyView() {

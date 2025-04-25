@@ -8,16 +8,17 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.RecyclerView
 import ru.hse.crowns.R
-import ru.hse.crowns.domain.boards.QueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.QueensBoard
 import ru.hse.crowns.databinding.BoardCellBinding
-import ru.hse.crowns.domain.boards.QueenCellStatus
+import ru.hse.crowns.domain.domainObjects.boards.QueenCellStatus
 
 class QueensBoardRecyclerAdapter(
     private val onItemClick: (row: Int, column: Int) -> Unit
 ) : RecyclerView.Adapter<BoardCellViewHolder>() {
 
     private lateinit var board: QueensBoard
-    private var currentMistakes = emptySet<Int>()
+    private var currentRed = emptySet<Int>()
+    private var currentGreen = emptySet<Int>()
 
     /**
      * Allows not to bind all itemView but change only a part of it
@@ -26,8 +27,9 @@ class QueensBoardRecyclerAdapter(
         VALUE,
         POLYOMINO,
         LISTENER,
-        ADD_MISTAKE,
-        REMOVE_MISTAKE
+        HIGHLIGHT_RED,
+        HIGHLIGHT_GREEN,
+        REMOVE_HIGHLIGHT
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -43,15 +45,25 @@ class QueensBoardRecyclerAdapter(
         notifyItemChanged(row * board.size + column, Payload.VALUE)
     }
 
-    fun updateMistakes(positions: Iterable<Pair<Int, Int>>) {
-        val mistakes = positions.map { it.first * board.size + it.second}.toSet()
-        for (position in (mistakes - currentMistakes)) {
-            notifyItemChanged(position, Payload.ADD_MISTAKE)
+    fun updateHighlights(greenPositions: Iterable<Pair<Int, Int>> = emptyList(),
+                         redPositions: Iterable<Pair<Int, Int>> = emptyList()) {
+        val green = greenPositions.map { it.first * board.size + it.second}.toSet()
+        for (position in (green - currentGreen)) {
+            notifyItemChanged(position, Payload.HIGHLIGHT_GREEN)
         }
-        for (position in (currentMistakes - mistakes)) {
-            notifyItemChanged(position, Payload.REMOVE_MISTAKE)
+        for (position in (currentGreen - green)) {
+            notifyItemChanged(position, Payload.REMOVE_HIGHLIGHT)
         }
-        currentMistakes = mistakes
+        currentGreen = green
+
+        val red = redPositions.map { it.first * board.size + it.second}.toSet()
+        for (position in (red - currentRed - currentGreen)) {
+            notifyItemChanged(position, Payload.HIGHLIGHT_RED)
+        }
+        for (position in (currentRed - red)) {
+            notifyItemChanged(position, Payload.REMOVE_HIGHLIGHT)
+        }
+        currentRed = red - currentGreen
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoardCellViewHolder {
@@ -60,14 +72,21 @@ class QueensBoardRecyclerAdapter(
         return BoardCellViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = board.size * board.size
+    override fun getItemCount(): Int {
+        return if (this::board.isInitialized) {
+            board.size * board.size
+        } else {
+            0
+        }
+    }
 
     override fun onBindViewHolder(holder: BoardCellViewHolder, position: Int) {
         onBindViewHolder(holder, position, mutableListOf(
             Payload.VALUE,
             Payload.POLYOMINO,
             Payload.LISTENER,
-            if(position in currentMistakes) Payload.ADD_MISTAKE else Payload.REMOVE_MISTAKE))
+            if(position in currentRed) Payload.HIGHLIGHT_RED else Payload.REMOVE_HIGHLIGHT,
+            if(position in currentGreen) Payload.HIGHLIGHT_GREEN else Payload.REMOVE_HIGHLIGHT))
     }
 
     override fun onBindViewHolder(
@@ -104,6 +123,8 @@ class QueensBoardRecyclerAdapter(
                         // Get color
                         val userColor: Color =
                             resources.getColor(R.color.user_values, null).toColor()
+                        val originalColor: Color =
+                            resources.getColor(R.color.original_values, null).toColor()
 
                         // Set value
                         when (board.getStatus(row, column)) {
@@ -114,7 +135,8 @@ class QueensBoardRecyclerAdapter(
 
                             QueenCellStatus.ORIGINAL_QUEEN -> holder.setValuePicture(
                                 queenDrawable,
-                                queenString
+                                queenString,
+                                originalColor
                             )
 
                             QueenCellStatus.USER_QUEEN -> holder.setValuePicture(
@@ -143,8 +165,9 @@ class QueensBoardRecyclerAdapter(
                         }
                     }
 
-                    Payload.ADD_MISTAKE -> holder.setMistakeColor()
-                    Payload.REMOVE_MISTAKE -> holder.removeMistakeColor()
+                    Payload.HIGHLIGHT_RED -> holder.highlightRed()
+                    Payload.HIGHLIGHT_GREEN -> holder.highLightGreen()
+                    Payload.REMOVE_HIGHLIGHT -> holder.removeHighlightColor()
                 }
             }
         } else {

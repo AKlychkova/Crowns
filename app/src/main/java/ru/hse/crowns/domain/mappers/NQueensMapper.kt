@@ -1,15 +1,20 @@
 package ru.hse.crowns.domain.mappers
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import ru.hse.crowns.data.repositories.NQueensGameRepository
-import ru.hse.crowns.domain.GameData
-import ru.hse.crowns.domain.boards.NQueensBoard
-import ru.hse.crowns.domain.boards.QueenCellStatus
+import ru.hse.crowns.domain.domainObjects.GameCharacteristics
+import ru.hse.crowns.domain.domainObjects.boards.NQueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.QueenCellStatus
 import ru.hse.crowns.proto.NQueensGameDTO
 import kotlin.math.max
 
 class NQueensMapper(private val repository: NQueensGameRepository) {
+
+    val hasDataFlow: Flow<Boolean> = repository.gameFlow.map { it != null }
+
     private fun mapDomainStatusToDataStatus(status: QueenCellStatus): NQueensGameDTO.CellStatus {
         return when (status) {
             QueenCellStatus.EMPTY -> NQueensGameDTO.CellStatus.EMPTY
@@ -36,7 +41,8 @@ class NQueensMapper(private val repository: NQueensGameRepository) {
     }
 
     private fun mapCellsToBoard(cells: List<NQueensGameDTO.Cell>): NQueensBoard {
-        val size: Int = max(cells.maxOf { cell -> cell.row }, cells.maxOf { cell -> cell.column }) + 1
+        val size: Int =
+            max(cells.maxOf { cell -> cell.row }, cells.maxOf { cell -> cell.column }) + 1
         val board = NQueensBoard(size, emptyList())
         for (cell in cells) {
             when (cell.status) {
@@ -64,10 +70,6 @@ class NQueensMapper(private val repository: NQueensGameRepository) {
         }
     }
 
-    suspend fun hasData(): Boolean {
-        return repository.getData() != null
-    }
-
     suspend fun getBoard(): NQueensBoard {
         return mapCellsToBoard(
             withContext(Dispatchers.IO) {
@@ -76,18 +78,13 @@ class NQueensMapper(private val repository: NQueensGameRepository) {
         )
     }
 
-    suspend fun getGameData(): GameData {
+    suspend fun getGameCharacteristic(): GameCharacteristics {
         val game: NQueensGameDTO = withContext(Dispatchers.IO) { repository.getData()!! }
-        return GameData(
+        return GameCharacteristics(
             time = game.time,
             hintCount = game.hintCount,
             mistakeCount = game.mistakeCount
         )
-    }
-
-    suspend fun getBoardSize() : Int {
-        val cells = withContext(Dispatchers.IO) { repository.getData()!!.cellsList }
-        return max(cells.maxOf { cell -> cell.row }, cells.maxOf { cell -> cell.column }) + 1
     }
 
     suspend fun removeData() {

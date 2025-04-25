@@ -1,6 +1,6 @@
 package ru.hse.crowns.domain.generation.nQueens
 
-import ru.hse.crowns.domain.boards.NQueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.NQueensBoard
 
 class NQueensBacktrackingSolutionGenerator : NQueensSolutionGenerator {
     /**

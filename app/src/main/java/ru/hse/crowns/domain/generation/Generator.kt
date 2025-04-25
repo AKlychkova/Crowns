@@ -1,5 +1,5 @@
 package ru.hse.crowns.domain.generation
 
-interface Generator<T> {
-    suspend fun generate() : T
+interface Generator<in I, out O> {
+    suspend fun generate(input: I) : O
 }

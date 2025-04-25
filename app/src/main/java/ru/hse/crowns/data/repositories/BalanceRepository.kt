@@ -41,7 +41,7 @@ class BalanceRepository(private val dataStore: DataStore<Preferences>) {
             if (currentBalance >= decrease) {
                 balance[COINS_BALANCE] = currentBalance - decrease
             } else {
-                balance[COINS_BALANCE] = 0
+                throw IllegalArgumentException()
             }
         }
     }

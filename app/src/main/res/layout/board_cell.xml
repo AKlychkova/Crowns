@@ -212,11 +212,11 @@
         tools:text="9" />
 
     <View
-        android:id="@+id/mistakeView"
+        android:id="@+id/highlightView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/mistake"
-        android:visibility="gone"
+        android:background="@null"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

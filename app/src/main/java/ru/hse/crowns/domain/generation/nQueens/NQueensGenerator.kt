@@ -1,13 +1,12 @@
 package ru.hse.crowns.domain.generation.nQueens
 
-import ru.hse.crowns.domain.boards.NQueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.NQueensBoard
 import ru.hse.crowns.domain.generation.Generator
 
 class NQueensGenerator(
-    private val boardSize: Int,
     private val uniqueChecker: NQueensUniqueChecker,
     private val solutionGenerator: NQueensSolutionGenerator
-) : Generator<NQueensBoard> {
+) : Generator<Int, NQueensBoard> {
 
     /**
      * Removes random queens without violating the unique solution condition
@@ -27,11 +26,12 @@ class NQueensGenerator(
 
     /**
      * Generate level of "N Queens" puzzle
+     * @param input board size
      * @return generated level
      */
-    override suspend fun generate(): NQueensBoard {
+    override suspend fun generate(input: Int): NQueensBoard {
         // Generate valid solution
-        val board = solutionGenerator.generateSolution(boardSize)
+        val board = solutionGenerator.generateSolution(input)
         // Remove some queens
         removeQueens(board)
         return board

@@ -1,6 +1,6 @@
 package ru.hse.crowns.domain.generation.dancingLinks
 
-import ru.hse.crowns.domain.boards.QueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.QueensBoard
 import ru.hse.crowns.domain.generation.queens.QueensUniqueChecker
 
 class QueensDLUniqueChecker : DLUniqueChecker(), QueensUniqueChecker {

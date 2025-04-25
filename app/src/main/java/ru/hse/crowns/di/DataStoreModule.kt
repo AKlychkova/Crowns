@@ -21,15 +21,15 @@ private const val QUEENS_NAME = "queens"
 private const val KILLER_SUDOKU_NAME = "n_queens"
 
 private val Context.preferencesDataStore: DataStore<Preferences> by preferencesDataStore(name = BALANCE_NAME)
-private val Context.nQueensDataStore: DataStore<NQueensGameDTO?> by dataStore(
+private val Context.nQueensDataStore: DataStore<NQueensGameDTO> by dataStore(
     fileName = N_QUEENS_NAME,
     serializer = NQueensGameSerializer
 )
-private val Context.queensDataStore: DataStore<QueensGameDTO?> by dataStore(
+private val Context.queensDataStore: DataStore<QueensGameDTO> by dataStore(
     fileName = QUEENS_NAME,
     serializer = QueensGameSerializer
 )
-private val Context.killerSudokuDataStore: DataStore<KillerSudokuGameDTO?> by dataStore(
+private val Context.killerSudokuDataStore: DataStore<KillerSudokuGameDTO> by dataStore(
     fileName = KILLER_SUDOKU_NAME,
     serializer = KillerSudokuGameSerializer
 )
@@ -39,15 +39,15 @@ val dataStoreModule = module {
         androidApplication().preferencesDataStore
     }
 
-    single<DataStore<NQueensGameDTO?>> (named<NQueensGameDTO>()) {
+    single<DataStore<NQueensGameDTO>> (named<NQueensGameDTO>()) {
         androidApplication().nQueensDataStore
     }
 
-    single<DataStore<QueensGameDTO?>> (named<QueensGameDTO>()) {
+    single<DataStore<QueensGameDTO>> (named<QueensGameDTO>()) {
         androidApplication().queensDataStore
     }
 
-    single<DataStore<KillerSudokuGameDTO?>> (named<KillerSudokuGameDTO>()) {
+    single<DataStore<KillerSudokuGameDTO>> (named<KillerSudokuGameDTO>()) {
         androidApplication().killerSudokuDataStore
     }
 }

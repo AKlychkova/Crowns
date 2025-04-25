@@ -7,9 +7,9 @@ import ru.hse.crowns.data.repositories.BalanceRepository
 import ru.hse.crowns.data.repositories.KillerSudokuGameRepository
 import ru.hse.crowns.data.repositories.NQueensGameRepository
 import ru.hse.crowns.data.repositories.QueensGameRepository
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
-import ru.hse.crowns.domain.boards.NQueensBoard
-import ru.hse.crowns.domain.boards.QueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.domainObjects.boards.NQueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.QueensBoard
 import ru.hse.crowns.domain.generation.Generator
 import ru.hse.crowns.domain.generation.dancingLinks.KillerSudokuDLUniqueChecker
 import ru.hse.crowns.domain.generation.dancingLinks.NQueensDLUniqueChecker
@@ -26,15 +26,22 @@ import ru.hse.crowns.domain.generation.queens.QueensBacktrackingSolutionGenerato
 import ru.hse.crowns.domain.generation.queens.QueensGenerator
 import ru.hse.crowns.domain.generation.queens.QueensSolutionGenerator
 import ru.hse.crowns.domain.generation.queens.QueensUniqueChecker
+import ru.hse.crowns.domain.hints.killerSudoku.KillerSudokuHint
+import ru.hse.crowns.domain.hints.killerSudoku.KillerSudokuHintsProvider
+import ru.hse.crowns.domain.hints.killerSudoku.KillerSudokuHintsProviderImpl
+import ru.hse.crowns.domain.hints.nQueens.NQueensHintsProvider
+import ru.hse.crowns.domain.hints.nQueens.NQueensHintsProviderImpl
+import ru.hse.crowns.domain.hints.queens.QueensHintsProvider
+import ru.hse.crowns.domain.hints.queens.QueensHintsProviderImpl
 import ru.hse.crowns.domain.mappers.KillerSudokuMapper
 import ru.hse.crowns.domain.mappers.NQueensMapper
 import ru.hse.crowns.domain.mappers.QueensMapper
-import ru.hse.crowns.domain.validation.KillerSudokuValidator
-import ru.hse.crowns.domain.validation.KillerSudokuValidatorImpl
-import ru.hse.crowns.domain.validation.NQueensValidator
-import ru.hse.crowns.domain.validation.NQueensValidatorImpl
-import ru.hse.crowns.domain.validation.QueensValidator
-import ru.hse.crowns.domain.validation.QueensValidatorImpl
+import ru.hse.crowns.domain.validation.killerSudoku.KillerSudokuValidator
+import ru.hse.crowns.domain.validation.killerSudoku.KillerSudokuValidatorImpl
+import ru.hse.crowns.domain.validation.nQueens.NQueensValidator
+import ru.hse.crowns.domain.validation.nQueens.NQueensValidatorImpl
+import ru.hse.crowns.domain.validation.queens.QueensValidator
+import ru.hse.crowns.domain.validation.queens.QueensValidatorImpl
 import ru.hse.crowns.proto.KillerSudokuGameDTO
 import ru.hse.crowns.proto.NQueensGameDTO
 import ru.hse.crowns.proto.QueensGameDTO
@@ -42,9 +49,8 @@ import ru.hse.crowns.proto.QueensGameDTO
 val appModule = module {
     single<KillerSudokuUniqueChecker> { KillerSudokuDLUniqueChecker() }
     single<KillerSudokuSolutionGenerator> { KillerSudokuBacktrackingSolutionGenerator() }
-    factory<Generator<KillerSudokuBoard>>(named<KillerSudokuBoard>()) { (maxToClear: Int) ->
+    single<Generator<Int, KillerSudokuBoard>>(named<KillerSudokuBoard>()) {
         KillerSudokuGenerator(
-            maxToClear,
             get(),
             get()
         )
@@ -53,9 +59,8 @@ val appModule = module {
 
     single<NQueensUniqueChecker> { NQueensDLUniqueChecker() }
     single<NQueensSolutionGenerator> { NQueensBacktrackingSolutionGenerator() }
-    factory<Generator<NQueensBoard>>(named<NQueensBoard>()) { (boardSize: Int) ->
+    single<Generator<Int, NQueensBoard>>(named<NQueensBoard>()) {
         NQueensGenerator(
-            boardSize,
             get(),
             get()
         )
@@ -64,9 +69,8 @@ val appModule = module {
 
     single<QueensUniqueChecker> { QueensDLUniqueChecker() }
     single<QueensSolutionGenerator> { QueensBacktrackingSolutionGenerator() }
-    factory<Generator<QueensBoard>>(named<QueensBoard>()) { (boardSize: Int) ->
+    single<Generator<Int, QueensBoard>>(named<QueensBoard>()) {
         QueensGenerator(
-            boardSize,
             get(),
             get()
         )
@@ -81,4 +85,8 @@ val appModule = module {
     single<NQueensMapper> { NQueensMapper(get()) }
     single<QueensMapper> { QueensMapper(get()) }
     single<KillerSudokuMapper> { KillerSudokuMapper(get()) }
+
+    single<NQueensHintsProvider> { NQueensHintsProviderImpl(get()) }
+    single<QueensHintsProvider> { QueensHintsProviderImpl(get()) }
+    single<KillerSudokuHintsProvider> { KillerSudokuHintsProviderImpl() }
 }

@@ -7,11 +7,11 @@ import ru.hse.crowns.proto.QueensGameDTO
 import java.io.InputStream
 import java.io.OutputStream
 
-object QueensGameSerializer: Serializer<QueensGameDTO?> {
-    override val defaultValue: QueensGameDTO?
-        get() = null
+object QueensGameSerializer: Serializer<QueensGameDTO> {
+    override val defaultValue: QueensGameDTO
+        get() = QueensGameDTO.getDefaultInstance()
 
-    override suspend fun readFrom(input: InputStream): QueensGameDTO? {
+    override suspend fun readFrom(input: InputStream): QueensGameDTO {
         try {
             return QueensGameDTO.parseFrom(input)
         } catch (exception: InvalidProtocolBufferException) {
@@ -19,8 +19,8 @@ object QueensGameSerializer: Serializer<QueensGameDTO?> {
         }
     }
 
-    override suspend fun writeTo(t: QueensGameDTO?, output: OutputStream) {
-        t?.writeTo(output)
+    override suspend fun writeTo(t: QueensGameDTO, output: OutputStream) {
+        t.writeTo(output)
     }
 
 }

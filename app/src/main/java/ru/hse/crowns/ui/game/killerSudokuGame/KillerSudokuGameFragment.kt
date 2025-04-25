@@ -9,22 +9,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.hse.crowns.databinding.FragmentKillerSudokuGameBinding
-import org.koin.core.parameter.parametersOf
 import ru.hse.crowns.R
 import ru.hse.crowns.adapters.KillerSudokuBoardRecyclerAdapter
-import ru.hse.crowns.domain.boards.BoardObserver
-import ru.hse.crowns.domain.validation.GameStatus
-import ru.hse.crowns.domain.validation.KillerSudokuMistake
+import ru.hse.crowns.domain.domainObjects.boards.BoardObserver
+import ru.hse.crowns.domain.hints.killerSudoku.KillerSudokuHint
+import ru.hse.crowns.domain.validation.gameStatuses.GameStatus
+import ru.hse.crowns.domain.validation.gameStatuses.KillerSudokuMistake
+import ru.hse.crowns.ui.dialogs.BuyHintDialog
+import ru.hse.crowns.ui.dialogs.PauseDialogFragment
 import ru.hse.crowns.ui.dialogs.WinDialogFragment
+import ru.hse.crowns.utils.HINT_PRICE
 import ru.hse.crowns.utils.KillerSudokuDifficultyLevel
 
 class KillerSudokuGameFragment : Fragment() {
     private var _binding: FragmentKillerSudokuGameBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: KillerSudokuGameViewModel
+    private val viewModel: KillerSudokuGameViewModel by viewModel()
     private lateinit var boardAdapter: KillerSudokuBoardRecyclerAdapter
 
     override fun onCreateView(
@@ -33,18 +36,6 @@ class KillerSudokuGameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentKillerSudokuGameBinding.inflate(inflater, container, false)
-
-        // define viewmodel
-        val level =
-            KillerSudokuDifficultyLevel.entries[requireArguments().getInt("difficultyLevel")]
-        viewModel = getViewModel { parametersOf(level.getMaxToDelete()) }
-
-        // define recycler view
-        binding.board.recyclerView.layoutManager = object : GridLayoutManager(context, 9) {
-            override fun canScrollVertically(): Boolean {
-                return false
-            }
-        }
 
         boardAdapter = KillerSudokuBoardRecyclerAdapter { row, column ->
             viewModel.onCellClick(
@@ -56,6 +47,40 @@ class KillerSudokuGameFragment : Fragment() {
             )
         }
         binding.board.recyclerView.adapter = boardAdapter
+
+        binding.hintImageButton.setOnClickListener {
+            if(viewModel.status.value !is KillerSudokuMistake) {
+                if(viewModel.hintCounter.value!! > 0) {
+                    BuyHintDialog { _, which: Int ->
+                        when (which) {
+                            DialogInterface.BUTTON_POSITIVE -> viewModel.getHint()
+                            DialogInterface.BUTTON_NEUTRAL -> {}
+                        }
+                    }.show(childFragmentManager, "BuyDialog")
+                } else {
+                    viewModel.getHint()
+                }
+            }
+        }
+
+        binding.pauseImageButton.setOnClickListener {
+            stopChronometer()
+            PauseDialogFragment{ _, which: Int ->
+                when (which) {
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        viewModel.startNewGame()
+                        viewModel.time = 0
+                        startChronometer()
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> {
+                        viewModel.rerun()
+                        viewModel.time = 0
+                        startChronometer()
+                    }
+                    DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
+                }
+            }.show(childFragmentManager, "PauseDialog")
+        }
 
         observeViewModel()
 
@@ -79,7 +104,7 @@ class KillerSudokuGameFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.isLoading.observe(viewLifecycleOwner) {
+        viewModel.isBoardLoading.observe(viewLifecycleOwner) {
             if (it) {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.content.visibility = View.GONE
@@ -91,7 +116,22 @@ class KillerSudokuGameFragment : Fragment() {
             }
         }
 
+        viewModel.isMessageLoading.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.messageProgressBar.visibility = View.VISIBLE
+                binding.messageTextView.visibility = View.INVISIBLE
+            } else {
+                binding.messageProgressBar.visibility = View.INVISIBLE
+                binding.messageTextView.visibility = View.VISIBLE
+            }
+        }
+
         viewModel.boardLD.observe(viewLifecycleOwner) {
+            binding.board.recyclerView.layoutManager = object : GridLayoutManager(context, it.size) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            }
             it.addObserver(object : BoardObserver {
                 override fun onChanged(row: Int, column: Int) {
                     boardAdapter.updateCellValue(row, column)
@@ -102,22 +142,23 @@ class KillerSudokuGameFragment : Fragment() {
 
         viewModel.status.observe(viewLifecycleOwner) {
             if (it is KillerSudokuMistake) {
-                binding.mistakeMessageTextView.text = it.getMessage()
-                boardAdapter.updateMistakes(it.positions.toList())
+                binding.messageTextView.text = it.getMessage()
+                boardAdapter.updateHighlights(redPositions = it.positions.toList())
             } else {
-                binding.mistakeMessageTextView.text = ""
-                boardAdapter.updateMistakes(emptyList())
+                binding.messageTextView.text = ""
+                boardAdapter.updateHighlights()
             }
             if (it is GameStatus.Win) {
-                binding.chronometer.stop()
-                viewModel.time = SystemClock.elapsedRealtime() - binding.chronometer.base
+                stopChronometer()
                 WinDialogFragment(
-                    viewModel.calculatePrize(
-                        KillerSudokuDifficultyLevel.entries[requireArguments().getInt("difficultyLevel")]
-                    )
+                    viewModel.calculatePrize()
                 ) { _, which: Int ->
                     when (which) {
-                        DialogInterface.BUTTON_POSITIVE -> viewModel.startNewGame()
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            viewModel.startNewGame()
+                            viewModel.time = 0
+                            startChronometer()
+                        }
                         DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
                     }
                 }.show(childFragmentManager, "WinDialog")
@@ -130,12 +171,68 @@ class KillerSudokuGameFragment : Fragment() {
 
         viewModel.hintCounter.observe(viewLifecycleOwner) {
             binding.hintCounterTextView.text = it.toString()
+            if (it > 0 && viewModel.currentBalance.value!! < HINT_PRICE) {
+                binding.hintImageButton.isEnabled = false
+            }
+        }
+
+        viewModel.currentBalance.observe(viewLifecycleOwner) {
+            if (it < HINT_PRICE && viewModel.hintCounter.value!! > 0) {
+                binding.hintImageButton.isEnabled = false
+            } else {
+                binding.hintImageButton.isEnabled = true
+            }
+        }
+
+        viewModel.hint.observe(viewLifecycleOwner) {
+            when (it) {
+                is KillerSudokuHint.OneEmptyInColumn -> {
+                    boardAdapter.updateHighlights(
+                        greenPositions = listOf(it.empty),
+                        redPositions = it.columnCells
+                    )
+                    binding.messageTextView.text =
+                        getString(R.string.ksudoku_one_in_column_hint_text, it.value)
+                }
+                is KillerSudokuHint.OneEmptyInPolyomino -> {
+                    boardAdapter.updateHighlights(
+                        greenPositions = listOf(it.empty),
+                        redPositions = it.polyominoCells
+                    )
+                    binding.messageTextView.text =
+                        getString(R.string.ksudoku_one_in_polyomino_hint_text, it.value)
+                }
+                is KillerSudokuHint.OneEmptyInRow -> {
+                    boardAdapter.updateHighlights(
+                        greenPositions = listOf(it.empty),
+                        redPositions = it.rowCells
+                    )
+                    binding.messageTextView.text =
+                        getString(R.string.ksudoku_one_in_row_hint_text, it.value)
+                }
+                KillerSudokuHint.Undefined -> {
+                    boardAdapter.updateHighlights()
+                    binding.messageTextView.text = getString(R.string.undefined_hint_text)
+                }
+
+                is KillerSudokuHint.OneEmptyInBox -> {
+                    boardAdapter.updateHighlights(
+                        greenPositions = listOf(it.empty),
+                        redPositions = it.boxCells
+                    )
+                    binding.messageTextView.text =
+                        getString(R.string.ksudoku_one_in_box_hint_text, it.value)
+                }
+            }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.updateBoard(requireArguments().getBoolean("fromDataStore"))
+        viewModel.updateBoard(
+            requireArguments().getBoolean("fromDataStore"),
+            KillerSudokuDifficultyLevel.entries[requireArguments().getInt("difficultyLevel")]
+        )
     }
 
     private fun startChronometer() {

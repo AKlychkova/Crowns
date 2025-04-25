@@ -1,4 +1,4 @@
-package ru.hse.crowns.domain.validation
+package ru.hse.crowns.domain.validation.gameStatuses
 
 sealed class KillerSudokuMistake(vararg val positions: Pair<Int, Int>) : GameStatus(){
     abstract fun getMessage() : String
@@ -23,13 +23,13 @@ sealed class KillerSudokuMistake(vararg val positions: Pair<Int, Int>) : GameSta
 
     class OnePolyomino(vararg positions: Pair<Int, Int>) : KillerSudokuMistake(*positions) {
         override fun getMessage(): String {
-            return "Одинаковые значения в одном полимино."
+            return "Одинаковые значения в одной цветовой зоне."
         }
     }
 
     class IncorrectSum(vararg positions: Pair<Int, Int>) : KillerSudokuMistake(*positions) {
         override fun getMessage(): String {
-            return "Неправильная сумма в выделенном полимино."
+            return "В выделенной цветовой зоне не может получиться правильная сумма."
         }
     }
 }

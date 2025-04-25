@@ -7,11 +7,11 @@ import ru.hse.crowns.proto.KillerSudokuGameDTO
 import java.io.InputStream
 import java.io.OutputStream
 
-object KillerSudokuGameSerializer : Serializer<KillerSudokuGameDTO?> {
-    override val defaultValue: KillerSudokuGameDTO?
-        get() = null
+object KillerSudokuGameSerializer : Serializer<KillerSudokuGameDTO> {
+    override val defaultValue: KillerSudokuGameDTO
+        get() = KillerSudokuGameDTO.getDefaultInstance()
 
-    override suspend fun readFrom(input: InputStream): KillerSudokuGameDTO? {
+    override suspend fun readFrom(input: InputStream): KillerSudokuGameDTO {
         try {
             return KillerSudokuGameDTO.parseFrom(input)
         } catch (exception: InvalidProtocolBufferException) {
@@ -19,7 +19,7 @@ object KillerSudokuGameSerializer : Serializer<KillerSudokuGameDTO?> {
         }
     }
 
-    override suspend fun writeTo(t: KillerSudokuGameDTO?, output: OutputStream) {
-        t?.writeTo(output)
+    override suspend fun writeTo(t: KillerSudokuGameDTO, output: OutputStream) {
+        t.writeTo(output)
     }
 }

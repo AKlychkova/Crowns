@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -12,26 +13,33 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.hse.crowns.data.repositories.BalanceRepository
-import ru.hse.crowns.domain.PrizeCalculator
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.prizeCalculation.PrizeCalculator
+import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
 import ru.hse.crowns.domain.generation.Generator
+import ru.hse.crowns.domain.hints.killerSudoku.KillerSudokuHint
+import ru.hse.crowns.domain.hints.killerSudoku.KillerSudokuHintsProvider
 import ru.hse.crowns.domain.mappers.KillerSudokuMapper
-import ru.hse.crowns.domain.validation.GameStatus
-import ru.hse.crowns.domain.validation.KillerSudokuMistake
-import ru.hse.crowns.domain.validation.KillerSudokuValidator
+import ru.hse.crowns.domain.validation.gameStatuses.GameStatus
+import ru.hse.crowns.domain.validation.gameStatuses.KillerSudokuMistake
+import ru.hse.crowns.domain.validation.killerSudoku.KillerSudokuValidator
+import ru.hse.crowns.utils.HINT_PRICE
 import ru.hse.crowns.utils.KillerSudokuDifficultyLevel
 
 class KillerSudokuGameViewModel(
-    private val boardGenerator: Generator<KillerSudokuBoard>,
+    private val boardGenerator: Generator<Int, KillerSudokuBoard>,
     private val boardValidator: KillerSudokuValidator,
     private val balanceRepository: BalanceRepository,
-    private val gameDataMapper: KillerSudokuMapper
+    private val gameDataMapper: KillerSudokuMapper,
+    private val hintsProvider: KillerSudokuHintsProvider
 ) : ViewModel() {
     private val _boardLD = MutableLiveData<KillerSudokuBoard>()
     val boardLD: LiveData<KillerSudokuBoard> get() = _boardLD
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
+    private val _isBoardLoading = MutableLiveData<Boolean>()
+    val isBoardLoading: LiveData<Boolean> get() = _isBoardLoading
+
+    private val _isMessageLoading = MutableLiveData<Boolean>(false)
+    val isMessageLoading: LiveData<Boolean> get() = _isMessageLoading
 
     private val _status = MutableLiveData<GameStatus>()
     val status: LiveData<GameStatus> get() = _status
@@ -42,6 +50,13 @@ class KillerSudokuGameViewModel(
     private val _hintCounter = MutableLiveData<Int>(0)
     val hintCounter: LiveData<Int> get() = _hintCounter
 
+    private var _hint = MutableLiveData<KillerSudokuHint>()
+    val hint: LiveData<KillerSudokuHint> = _hint
+
+    val currentBalance = balanceRepository.coinsBalanceFlow.asLiveData()
+
+    lateinit var level: KillerSudokuDifficultyLevel
+
     /**
      * Time in milliseconds
      */
@@ -49,26 +64,27 @@ class KillerSudokuGameViewModel(
 
     private var getBoardJob: Job? = null
 
-    private fun generateBoard() {
-        _isLoading.value = true
+    private fun generateBoard(level: KillerSudokuDifficultyLevel) {
+        _isBoardLoading.value = true
         getBoardJob?.cancel()
         getBoardJob = viewModelScope.launch(Dispatchers.Default) {
-            val board = boardGenerator.generate()
+            val board = boardGenerator.generate(level.getMaxToDelete())
             if (isActive) {
                 launch(Dispatchers.Main) {
                     _boardLD.value = board
-                    _isLoading.value = false
+                    _isBoardLoading.value = false
                 }
             }
         }
     }
 
     private fun readFromDataStore() {
-        _isLoading.value = true
+        _isBoardLoading.value = true
         getBoardJob?.cancel()
         getBoardJob = viewModelScope.launch(Dispatchers.Default) {
             val board = gameDataMapper.getBoard()
             val data = gameDataMapper.getGameData()
+            val lev = gameDataMapper.getLevel()
             if (isActive) {
                 launch(Dispatchers.Main) {
                     _boardLD.value = board
@@ -76,18 +92,20 @@ class KillerSudokuGameViewModel(
                     _mistakeCounter.value = data.mistakeCount
                     _status.value = boardValidator.check(board) ?: GameStatus.Neutral
                     time = data.time
-                    _isLoading.value = false
+                    level = lev
+                    _isBoardLoading.value = false
                 }
             }
         }
     }
 
-    fun updateBoard(fromDataStore: Boolean) {
+    fun updateBoard(fromDataStore: Boolean, level: KillerSudokuDifficultyLevel) {
         if (!boardLD.isInitialized) {
-            if(fromDataStore) {
+            if (fromDataStore) {
                 readFromDataStore()
             } else {
-                generateBoard()
+                this.level = level
+                generateBoard(level)
             }
         }
     }
@@ -125,18 +143,18 @@ class KillerSudokuGameViewModel(
         }
     }
 
-    private fun increaseBalance(prize:Int) = viewModelScope.launch(Dispatchers.IO) {
+    private fun increaseBalance(prize: Int) = viewModelScope.launch(Dispatchers.IO) {
         balanceRepository.increaseCoinsBalance(prize)
     }
 
-    private fun clearCache() = viewModelScope.launch(Dispatchers.IO){
+    private fun clearCache() = viewModelScope.launch(Dispatchers.IO) {
         gameDataMapper.removeData()
     }
 
-    fun calculatePrize(level: KillerSudokuDifficultyLevel): Int {
+    fun calculatePrize(): Int {
         val prize = PrizeCalculator.calculate(
             time = (time / 60_000).toInt(),
-            level = when(level) {
+            level = when (level) {
                 KillerSudokuDifficultyLevel.EASY -> 0.0
                 KillerSudokuDifficultyLevel.MEDIUM -> 2.5
                 KillerSudokuDifficultyLevel.DIFFICULT -> 5.0
@@ -149,13 +167,13 @@ class KillerSudokuGameViewModel(
     }
 
     fun startNewGame() {
-        generateBoard()
+        generateBoard(level)
         _hintCounter.value = 0
         _mistakeCounter.value = 0
         _status.value = GameStatus.Neutral
     }
 
-    fun cache(level : Int) = viewModelScope.launch(Dispatchers.Default) {
+    fun cache(level: Int) = viewModelScope.launch(Dispatchers.Default) {
         withContext(NonCancellable) {
             gameDataMapper.saveGameData(
                 board = boardLD.value!!,
@@ -166,5 +184,33 @@ class KillerSudokuGameViewModel(
             )
             Log.d("save", "sudoku data saved")
         }
+    }
+
+    fun getHint() {
+        boardLD.value?.let { board ->
+            _isMessageLoading.value = true
+            viewModelScope.launch(Dispatchers.Default) {
+                val hint = hintsProvider.provideHint(board)
+                launch(Dispatchers.Main) {
+                    if (hint !is KillerSudokuHint.Undefined) {
+                        _hintCounter.value = _hintCounter.value?.plus(1)
+                        if (_hintCounter.value!! > 1) {
+                            balanceRepository.decreaseCoinsBalance(HINT_PRICE)
+                        }
+                    }
+                    _hint.value = hint
+                    _isMessageLoading.value = false
+                }
+            }
+        }
+    }
+
+    fun rerun() {
+        _isBoardLoading.value = true
+        boardLD.value?.backToOriginal()
+        _hintCounter.value = 0
+        _mistakeCounter.value = 0
+        _status.value = GameStatus.Neutral
+        _isBoardLoading.value = false
     }
 }

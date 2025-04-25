@@ -1,6 +1,6 @@
 package ru.hse.crowns.domain.generation.dancingLinks
 
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
 import ru.hse.crowns.domain.generation.killerSudoku.KillerSudokuUniqueChecker
 
 class KillerSudokuDLUniqueChecker : DLUniqueChecker(), KillerSudokuUniqueChecker {

@@ -1,15 +1,19 @@
 package ru.hse.crowns.domain.mappers
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import ru.hse.crowns.data.repositories.QueensGameRepository
-import ru.hse.crowns.domain.GameData
-import ru.hse.crowns.domain.boards.QueenCellStatus
-import ru.hse.crowns.domain.boards.QueensBoard
+import ru.hse.crowns.domain.domainObjects.GameCharacteristics
+import ru.hse.crowns.domain.domainObjects.boards.QueenCellStatus
+import ru.hse.crowns.domain.domainObjects.boards.QueensBoard
 import ru.hse.crowns.proto.QueensGameDTO
 import kotlin.math.max
 
 class QueensMapper(private val repository: QueensGameRepository) {
+    val hasDataFlow: Flow<Boolean> = repository.gameFlow.map { it != null }
+
     private fun mapDomainStatusToDataStatus(status: QueenCellStatus): QueensGameDTO.CellStatus {
         return when (status) {
             QueenCellStatus.EMPTY -> QueensGameDTO.CellStatus.EMPTY
@@ -71,10 +75,6 @@ class QueensMapper(private val repository: QueensGameRepository) {
         }
     }
 
-    suspend fun hasData(): Boolean {
-        return repository.getData() != null
-    }
-
     suspend fun getBoard(): QueensBoard {
         return mapCellsToBoard(
             withContext(Dispatchers.IO) {
@@ -83,18 +83,13 @@ class QueensMapper(private val repository: QueensGameRepository) {
         )
     }
 
-    suspend fun getGameData(): GameData {
+    suspend fun getGameData(): GameCharacteristics {
         val game: QueensGameDTO = withContext(Dispatchers.IO) { repository.getData()!! }
-        return GameData(
+        return GameCharacteristics(
             time = game.time,
             hintCount = game.hintCount,
             mistakeCount = game.mistakeCount
         )
-    }
-
-    suspend fun getBoardSize(): Int {
-        val cells = withContext(Dispatchers.IO) { repository.getData()!!.cellsList }
-        return max(cells.maxOf { cell -> cell.row }, cells.maxOf { cell -> cell.column }) + 1
     }
 
     suspend fun removeData() {

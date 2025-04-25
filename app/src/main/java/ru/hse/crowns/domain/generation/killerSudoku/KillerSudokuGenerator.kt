@@ -1,21 +1,18 @@
 package ru.hse.crowns.domain.generation.killerSudoku
 
-import ru.hse.crowns.domain.boards.KillerSudokuBoard
+import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
 import ru.hse.crowns.domain.generation.Generator
 
-/**
- * @property maxToClear maximum number of empty cells in generated Killer Sudoku level
- */
-class KillerSudokuGenerator(private val maxToClear: Int,
-                            private val uniqueChecker: KillerSudokuUniqueChecker,
+class KillerSudokuGenerator(private val uniqueChecker: KillerSudokuUniqueChecker,
                             private val solutionGenerator: KillerSudokuSolutionGenerator
-) : Generator<KillerSudokuBoard> {
+) : Generator<Int, KillerSudokuBoard> {
 
     /**
      * Randomly clear no more than [maxToClear] cells without violating the unique solution condition
      * @param board board where cells must be cleared
+     * @param maxToClear maximum number of empty cells in generated Killer Sudoku level
      */
-    private suspend fun clearCells(board: KillerSudokuBoard) {
+    private suspend fun clearCells(maxToClear: Int, board: KillerSudokuBoard) {
         for (cell in (0 until board.size * board.size).shuffled()) {
             if (board.emptyCellsCount >= maxToClear) {
                 break
@@ -34,13 +31,14 @@ class KillerSudokuGenerator(private val maxToClear: Int,
 
     /**
      * Generate level of "Killer Sudoku" puzzle
+     * @param input maximum number of empty cells in generated Killer Sudoku level
      * @return generated level
      */
-    override suspend fun generate() : KillerSudokuBoard {
+    override suspend fun generate(input: Int): KillerSudokuBoard {
         // Generate valid solution
         val board: KillerSudokuBoard = solutionGenerator.generateSolution()
         // Clear some cells
-        clearCells(board)
+        clearCells(input, board)
         return board
     }
 }

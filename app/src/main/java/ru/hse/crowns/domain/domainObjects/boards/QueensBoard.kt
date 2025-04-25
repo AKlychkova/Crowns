@@ -1,4 +1,4 @@
-package ru.hse.crowns.domain.boards
+package ru.hse.crowns.domain.domainObjects.boards
 
 /**
  * @property size board dimension
@@ -266,6 +266,33 @@ class QueensBoard(
         return cellStatuses[row][column]
     }
 
+    /**
+     * @return [List] with row statuses
+     * @param rowIndex index of the row
+     * @throws IndexOutOfBoundsException if [rowIndex] is out of the board bounds
+     */
+    fun getRow(rowIndex: Int): List<QueenCellStatus> {
+        if (rowIndex !in cellStatuses.indices) {
+            throw IndexOutOfBoundsException()
+        }
+        return cellStatuses[rowIndex].toList()
+    }
+
+    /**
+     * @return [List] with column statuses
+     * @param columnIndex index of the column
+     * @throws IndexOutOfBoundsException if [columnIndex] is out of the board bounds
+     */
+    fun getColumn(columnIndex: Int): List<QueenCellStatus> {
+        if (columnIndex !in cellStatuses.indices) {
+            throw IndexOutOfBoundsException()
+        }
+        val column = ArrayList<QueenCellStatus>(size)
+        for (i in 0 until size) {
+            column.add(cellStatuses[i][columnIndex])
+        }
+        return column
+    }
 
     override fun addObserver(observer: BoardObserver) {
         observers.add(observer)
@@ -283,5 +310,34 @@ class QueensBoard(
 
     override fun clearObservers() {
         observers.clear()
+    }
+
+    fun clone(): QueensBoard {
+        val newBoard = QueensBoard(
+            size,
+            emptyList(),
+            polyominoDivision
+        )
+        for(i in 0 until size) {
+            for(j in 0 until size) {
+                when(cellStatuses[i][j]) {
+                    QueenCellStatus.EMPTY -> {}
+                    QueenCellStatus.ORIGINAL_QUEEN -> newBoard.addQueen(i, j)
+                    QueenCellStatus.USER_QUEEN -> newBoard.addUserQueen(i, j)
+                    QueenCellStatus.CROSS -> newBoard.setCross(i, j)
+                }
+            }
+        }
+        return newBoard
+    }
+
+    fun backToOriginal() {
+        for(i in 0 until size) {
+            for(j in 0 until size) {
+                if(cellStatuses[i][j] != QueenCellStatus.ORIGINAL_QUEEN) {
+                    clearCell(i, j)
+                }
+            }
+        }
     }
 }

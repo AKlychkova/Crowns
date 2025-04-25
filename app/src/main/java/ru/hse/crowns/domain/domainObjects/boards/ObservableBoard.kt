@@ -1,4 +1,4 @@
-package ru.hse.crowns.domain.boards
+package ru.hse.crowns.domain.domainObjects.boards
 
 interface ObservableBoard {
     /**

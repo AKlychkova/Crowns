@@ -124,11 +124,17 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         }
     }
 
-    fun setMistakeColor() {
-        binding.mistakeView.visibility = View.VISIBLE
+    fun highlightRed() {
+        val color: Int = itemView.resources.getColor(R.color.mistake, null)
+        binding.highlightView.setBackgroundColor(color)
     }
 
-    fun removeMistakeColor() {
-        binding.mistakeView.visibility = View.GONE
+    fun removeHighlightColor() {
+        binding.highlightView.background = null
+    }
+
+    fun highLightGreen() {
+        val color: Int = itemView.resources.getColor(R.color.highlight, null)
+        binding.highlightView.setBackgroundColor(color)
     }
 }

@@ -1,4 +1,4 @@
-package ru.hse.crowns.domain.boards
+package ru.hse.crowns.domain.domainObjects.boards
 
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -202,7 +202,7 @@ class KillerSudokuBoard internal constructor(
      * @param boxId id of the box
      * @throws IndexOutOfBoundsException if boxId is out of the bounds
      */
-    fun getBox(boxId: Int) = sequence<Int> {
+    fun getBox(boxId: Int) = sequence<Int?> {
         if (boxId !in 0 until boxesInRow * boxesInRow) {
             throw IndexOutOfBoundsException()
         }
@@ -210,7 +210,25 @@ class KillerSudokuBoard internal constructor(
         val column: Int = boxId % boxesInRow * boxSize
         for (i in 0 until boxSize) {
             for (j in 0 until boxSize) {
-                yield(abs(sudokuGrid[row + i][column + j]))
+                yield(getValue(row + i, column + j))
+            }
+        }
+    }
+
+    /**
+     * @return Coordinates of boxes' cells
+     * @param boxId id of the box
+     * @throws IndexOutOfBoundsException if boxId is out of the bounds
+     */
+    fun getBoxCoordinates(boxId: Int) = sequence<Pair<Int, Int>> {
+        if (boxId !in 0 until boxesInRow * boxesInRow) {
+            throw IndexOutOfBoundsException()
+        }
+        val row: Int = boxId / boxesInRow * boxSize
+        val column: Int = boxId % boxesInRow * boxSize
+        for (i in 0 until boxSize) {
+            for (j in 0 until boxSize) {
+                yield(Pair(row + i,column + j))
             }
         }
     }
@@ -444,11 +462,11 @@ class KillerSudokuBoard internal constructor(
      * @param rowIndex index of the row
      * @throws IndexOutOfBoundsException if [rowIndex] is out of the board bounds
      */
-    fun getRow(rowIndex: Int): List<Int> {
+    fun getRow(rowIndex: Int): List<Int?> {
         if (rowIndex !in sudokuGrid.indices) {
             throw IndexOutOfBoundsException()
         }
-        return sudokuGrid[rowIndex].map { value: Int -> abs(value) }
+        return sudokuGrid[rowIndex].map { value: Int -> if (value != 0) abs(value) else null}
     }
 
     /**
@@ -456,15 +474,25 @@ class KillerSudokuBoard internal constructor(
      * @param columnIndex index of the column
      * @throws IndexOutOfBoundsException if [columnIndex] is out of the board bounds
      */
-    fun getColumn(columnIndex: Int): List<Int> {
+    fun getColumn(columnIndex: Int): List<Int?> {
         if (columnIndex !in sudokuGrid.indices) {
             throw IndexOutOfBoundsException()
         }
-        val column = ArrayList<Int>(size)
+        val column = ArrayList<Int?>(size)
         for (i in 0 until size) {
-            column.add(abs(sudokuGrid[i][columnIndex]))
+            column.add(getValue(i, columnIndex))
         }
         return column
+    }
+
+    fun backToOriginal() {
+        for(i in 0 until size) {
+            for(j in 0 until size) {
+                if(!isOriginal(i, j)) {
+                    clearCell(i, j)
+                }
+            }
+        }
     }
 
     override fun addObserver(observer: BoardObserver) {

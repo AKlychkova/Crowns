@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -12,27 +13,34 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.hse.crowns.data.repositories.BalanceRepository
-import ru.hse.crowns.domain.PrizeCalculator
-import ru.hse.crowns.domain.boards.NQueensBoard
-import ru.hse.crowns.domain.boards.QueenCellStatus
+import ru.hse.crowns.domain.prizeCalculation.PrizeCalculator
+import ru.hse.crowns.domain.domainObjects.boards.NQueensBoard
+import ru.hse.crowns.domain.domainObjects.boards.QueenCellStatus
 import ru.hse.crowns.domain.generation.Generator
+import ru.hse.crowns.domain.hints.nQueens.NQueensHint
+import ru.hse.crowns.domain.hints.nQueens.NQueensHintsProvider
 import ru.hse.crowns.domain.mappers.NQueensMapper
-import ru.hse.crowns.domain.validation.GameStatus
-import ru.hse.crowns.domain.validation.NQueensMistake
-import ru.hse.crowns.domain.validation.NQueensValidator
+import ru.hse.crowns.domain.validation.gameStatuses.GameStatus
+import ru.hse.crowns.domain.validation.gameStatuses.NQueensMistake
+import ru.hse.crowns.domain.validation.nQueens.NQueensValidator
+import ru.hse.crowns.utils.HINT_PRICE
 
 class NQueensGameViewModel(
-    private val boardGenerator: Generator<NQueensBoard>,
+    private val boardGenerator: Generator<Int, NQueensBoard>,
     private val boardValidator: NQueensValidator,
     private val balanceRepository: BalanceRepository,
-    private val gameDataMapper: NQueensMapper
+    private val gameDataMapper: NQueensMapper,
+    private val hintsProvider: NQueensHintsProvider
 ) : ViewModel() {
 
     private val _boardLD = MutableLiveData<NQueensBoard>()
     val boardLD: LiveData<NQueensBoard> get() = _boardLD
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
+    private val _isBoardLoading = MutableLiveData<Boolean>()
+    val isBoardLoading: LiveData<Boolean> get() = _isBoardLoading
+
+    private val _isMessageLoading = MutableLiveData<Boolean>(false)
+    val isMessageLoading: LiveData<Boolean> get() = _isMessageLoading
 
     private val _status = MutableLiveData<GameStatus>()
     val status: LiveData<GameStatus> get() = _status
@@ -43,6 +51,11 @@ class NQueensGameViewModel(
     private val _hintCounter = MutableLiveData<Int>(0)
     val hintCounter: LiveData<Int> get() = _hintCounter
 
+    private var _hint = MutableLiveData<NQueensHint>()
+    val hint: LiveData<NQueensHint> = _hint
+
+    val currentBalance = balanceRepository.coinsBalanceFlow.asLiveData()
+
     /**
      * Time in milliseconds
      */
@@ -50,26 +63,26 @@ class NQueensGameViewModel(
 
     private var getBoardJob: Job? = null
 
-    private fun generateBoard() {
-        _isLoading.value = true
+    private fun generateBoard(boardSize: Int) {
+        _isBoardLoading.value = true
         getBoardJob?.cancel()
         getBoardJob = viewModelScope.launch(Dispatchers.Default) {
-            val board = boardGenerator.generate()
+            val board = boardGenerator.generate(boardSize)
             if (isActive) {
                 launch(Dispatchers.Main) {
                     _boardLD.value = board
-                    _isLoading.value = false
+                    _isBoardLoading.value = false
                 }
             }
         }
     }
 
     private fun readFromDataStore() {
-        _isLoading.value = true
+        _isBoardLoading.value = true
         getBoardJob?.cancel()
         getBoardJob = viewModelScope.launch(Dispatchers.Default) {
             val board = gameDataMapper.getBoard()
-            val data = gameDataMapper.getGameData()
+            val data = gameDataMapper.getGameCharacteristic()
             if (isActive) {
                 launch(Dispatchers.Main) {
                     _boardLD.value = board
@@ -77,18 +90,18 @@ class NQueensGameViewModel(
                     _mistakeCounter.value = data.mistakeCount
                     _status.value = boardValidator.check(board) ?: GameStatus.Neutral
                     time = data.time
-                    _isLoading.value = false
+                    _isBoardLoading.value = false
                 }
             }
         }
     }
 
-    fun updateBoard(fromDataStore: Boolean) {
+    fun updateBoard(fromDataStore: Boolean, boardSize: Int) {
         if (!boardLD.isInitialized) {
             if(fromDataStore) {
                 readFromDataStore()
             } else {
-                generateBoard()
+                generateBoard(boardSize)
             }
         }
     }
@@ -108,21 +121,19 @@ class NQueensGameViewModel(
                 }
             }
 
-            val mistake:NQueensMistake? = boardValidator.check(board)
+            val mistake: NQueensMistake? = boardValidator.check(board)
             if (mistake != null) {
                 _mistakeCounter.value = (_mistakeCounter.value ?: 0) + 1
                 _status.value = mistake!!
             } else if (board.getQueensCount() == board.size) {
                 _status.value = GameStatus.Win
-                clearCache()
+                viewModelScope.launch(Dispatchers.IO) {
+                    gameDataMapper.removeData()
+                }
             } else {
                 _status.value = GameStatus.Neutral
             }
         }
-    }
-
-    private fun clearCache() = viewModelScope.launch(Dispatchers.IO){
-        gameDataMapper.removeData()
     }
 
     fun calculatePrize(): Int {
@@ -136,7 +147,7 @@ class NQueensGameViewModel(
         return prize
     }
 
-    private fun increaseBalance(prize:Int) = viewModelScope.launch(Dispatchers.IO) {
+    private fun increaseBalance(prize: Int) = viewModelScope.launch(Dispatchers.IO) {
         balanceRepository.increaseCoinsBalance(prize)
     }
 
@@ -144,7 +155,7 @@ class NQueensGameViewModel(
         _hintCounter.value = 0
         _mistakeCounter.value = 0
         _status.value = GameStatus.Neutral
-        generateBoard()
+        generateBoard(boardLD.value!!.size)
     }
 
     fun cache() = viewModelScope.launch(Dispatchers.Default) {
@@ -157,5 +168,33 @@ class NQueensGameViewModel(
             )
             Log.d("save", "n queens data saved")
         }
+    }
+
+    fun getHint() {
+        boardLD.value?.let { board ->
+            _isMessageLoading.value = true
+            viewModelScope.launch(Dispatchers.Default) {
+                val hint = hintsProvider.provideHint(board)
+                launch(Dispatchers.Main) {
+                    if (hint !is NQueensHint.Undefined) {
+                        _hintCounter.value = _hintCounter.value?.plus(1)
+                        if (_hintCounter.value!! > 1) {
+                            balanceRepository.decreaseCoinsBalance(HINT_PRICE)
+                        }
+                    }
+                    _hint.value = hint
+                    _isMessageLoading.value = false
+                }
+            }
+        }
+    }
+
+    fun rerun() {
+        _isBoardLoading.value = true
+        boardLD.value?.backToOriginal()
+        _hintCounter.value = 0
+        _mistakeCounter.value = 0
+        _status.value = GameStatus.Neutral
+        _isBoardLoading.value = false
     }
 }
