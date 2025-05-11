@@ -188,17 +188,23 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
             it.isNotEmpty() && it.size < board.getPolyominoCount()
         }
         for (subset in polyominoSubsets) {
+            val coordinates = subset.map { polyominoId ->
+                board.getPolyominoCoordinates(polyominoId)
+                    .filter { board.getStatus(it.first, it.second) == QueenCellStatus.EMPTY }
+            }
+            if (coordinates.any { it.isEmpty() }) {
+                continue
+            }
             var minRow: Int = board.size
             var maxRow: Int = -1
             var minCol: Int = board.size
             var maxCol: Int = -1
 
-            for (polyominoId in subset) {
-                val coordinates = board.getPolyominoCoordinates(polyominoId)
-                minRow = min(minRow, coordinates.minOf { it.first })
-                maxRow = max(maxRow, coordinates.maxOf { it.first })
-                minCol = min(minCol, coordinates.minOf { it.second })
-                maxCol = max(maxCol, coordinates.maxOf { it.second })
+            for (polyomino in coordinates) {
+                minRow = min(minRow, polyomino.minOf { it.first })
+                maxRow = max(maxRow, polyomino.maxOf { it.first })
+                minCol = min(minCol, polyomino.minOf { it.second })
+                maxCol = max(maxCol, polyomino.maxOf { it.second })
             }
 
             if (subset.size == maxRow - minRow + 1) {
@@ -207,7 +213,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                         Pair(rowId, colId)
                     }
                 }.flatten()
-                val zone = subset.map { pId -> board.getPolyominoCoordinates(pId) }.flatten()
+                val zone = coordinates.flatten()
                 if (exclusion.any {
                         it !in zone && board.getStatus(
                             it.first,
@@ -228,7 +234,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                         Pair(rowId, colId)
                     }
                 }.flatten()
-                val zone = subset.map { pId -> board.getPolyominoCoordinates(pId) }.flatten()
+                val zone = coordinates.flatten()
                 if (exclusion.any {
                         it !in zone && board.getStatus(
                             it.first,
