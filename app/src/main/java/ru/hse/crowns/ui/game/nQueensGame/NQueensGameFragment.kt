@@ -6,32 +6,27 @@ import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 import ru.hse.crowns.R
 import ru.hse.crowns.adapters.NQueensBoardRecyclerAdapter
 import ru.hse.crowns.databinding.FragmentNQueensGameBinding
 import ru.hse.crowns.domain.domainObjects.boards.BoardObserver
 import ru.hse.crowns.domain.hints.nQueens.NQueensHint
 import ru.hse.crowns.domain.validation.gameStatuses.GameStatus
-import ru.hse.crowns.domain.validation.gameStatuses.KillerSudokuMistake
 import ru.hse.crowns.domain.validation.gameStatuses.NQueensMistake
 import ru.hse.crowns.ui.dialogs.BuyHintDialog
 import ru.hse.crowns.ui.dialogs.PauseDialogFragment
 import ru.hse.crowns.ui.dialogs.WinDialogFragment
 import ru.hse.crowns.utils.HINT_PRICE
-import kotlin.math.sqrt
 
 class NQueensGameFragment : Fragment() {
     private var _binding: FragmentNQueensGameBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: NQueensGameViewModel  by viewModel()
+    private val viewModel: NQueensGameViewModel by viewModel()
 
     private lateinit var boardAdapter: NQueensBoardRecyclerAdapter
 
@@ -53,13 +48,14 @@ class NQueensGameFragment : Fragment() {
         binding.board.recyclerView.adapter = boardAdapter
 
         binding.hintImageButton.setOnClickListener {
-            if(viewModel.status.value !is NQueensMistake) {
-                if(viewModel.hintCounter.value!! > 0) {
+            if (viewModel.status.value !is NQueensMistake) {
+                if (viewModel.hintCounter.value!! > 0) {
                     BuyHintDialog { _, which: Int ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 viewModel.getHint()
                             }
+
                             DialogInterface.BUTTON_NEUTRAL -> {}
                         }
                     }.show(childFragmentManager, "BuyDialog")
@@ -71,21 +67,28 @@ class NQueensGameFragment : Fragment() {
 
         binding.pauseImageButton.setOnClickListener {
             stopChronometer()
-            PauseDialogFragment{ _, which: Int ->
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        viewModel.startNewGame()
-                        viewModel.time = 0
-                        startChronometer()
+            PauseDialogFragment(
+                onClickListener = { _, which: Int ->
+                    when (which) {
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            viewModel.startNewGame()
+                            viewModel.time = 0
+                            startChronometer()
+                        }
+
+                        DialogInterface.BUTTON_NEGATIVE -> {
+                            viewModel.rerun()
+                            viewModel.time = 0
+                            startChronometer()
+                        }
+
+                        DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
                     }
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        viewModel.rerun()
-                        viewModel.time = 0
-                        startChronometer()
-                    }
-                    DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
+                },
+                onCancel = {
+                    startChronometer()
                 }
-            }.show(childFragmentManager, "PauseDialog")
+            ).show(childFragmentManager, "PauseDialog")
         }
 
         observeViewModel()
@@ -177,11 +180,12 @@ class NQueensGameFragment : Fragment() {
         }
 
         viewModel.boardLD.observe(viewLifecycleOwner) {
-            binding.board.recyclerView.layoutManager = object : GridLayoutManager(context, it.size) {
-                override fun canScrollVertically(): Boolean {
-                    return false
+            binding.board.recyclerView.layoutManager =
+                object : GridLayoutManager(context, it.size) {
+                    override fun canScrollVertically(): Boolean {
+                        return false
+                    }
                 }
-            }
             it.addObserver(object : BoardObserver {
                 override fun onChanged(row: Int, column: Int) {
                     boardAdapter.updateCellValue(row, column)
@@ -209,6 +213,7 @@ class NQueensGameFragment : Fragment() {
                             viewModel.time = 0
                             startChronometer()
                         }
+
                         DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
                     }
                 }.show(childFragmentManager, "WinDialog")

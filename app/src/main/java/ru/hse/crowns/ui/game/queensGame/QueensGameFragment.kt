@@ -48,13 +48,14 @@ class QueensGameFragment : Fragment() {
         binding.board.recyclerView.adapter = boardAdapter
 
         binding.hintImageButton.setOnClickListener {
-            if(viewModel.status.value !is QueensMistake) {
-                if(viewModel.hintCounter.value!! > 0) {
+            if (viewModel.status.value !is QueensMistake) {
+                if (viewModel.hintCounter.value!! > 0) {
                     BuyHintDialog { _, which: Int ->
                         when (which) {
                             DialogInterface.BUTTON_POSITIVE -> {
                                 viewModel.getHint()
                             }
+
                             DialogInterface.BUTTON_NEUTRAL -> {}
                         }
                     }.show(childFragmentManager, "BuyDialog")
@@ -66,21 +67,28 @@ class QueensGameFragment : Fragment() {
 
         binding.pauseImageButton.setOnClickListener {
             stopChronometer()
-            PauseDialogFragment{ _, which: Int ->
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        viewModel.startNewGame()
-                        viewModel.time = 0
-                        startChronometer()
+            PauseDialogFragment(
+                onClickListener = { _, which: Int ->
+                    when (which) {
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            viewModel.startNewGame()
+                            viewModel.time = 0
+                            startChronometer()
+                        }
+
+                        DialogInterface.BUTTON_NEGATIVE -> {
+                            viewModel.rerun()
+                            viewModel.time = 0
+                            startChronometer()
+                        }
+
+                        DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
                     }
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        viewModel.rerun()
-                        viewModel.time = 0
-                        startChronometer()
-                    }
-                    DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
+                },
+                onCancel = {
+                    startChronometer()
                 }
-            }.show(childFragmentManager, "PauseDialog")
+            ).show(childFragmentManager, "PauseDialog")
         }
 
         observeViewModel()
@@ -112,11 +120,12 @@ class QueensGameFragment : Fragment() {
         }
 
         viewModel.boardLD.observe(viewLifecycleOwner) {
-            binding.board.recyclerView.layoutManager = object : GridLayoutManager(context, it.size) {
-                override fun canScrollVertically(): Boolean {
-                    return false
+            binding.board.recyclerView.layoutManager =
+                object : GridLayoutManager(context, it.size) {
+                    override fun canScrollVertically(): Boolean {
+                        return false
+                    }
                 }
-            }
             it.addObserver(object : BoardObserver {
                 override fun onChanged(row: Int, column: Int) {
                     boardAdapter.updateCellValue(row, column)
@@ -126,7 +135,7 @@ class QueensGameFragment : Fragment() {
         }
 
         viewModel.status.observe(viewLifecycleOwner) {
-            if(it is QueensMistake) {
+            if (it is QueensMistake) {
                 binding.messageTextView.text = it.getMessage()
                 boardAdapter.updateHighlights(redPositions = it.positions.toList())
             } else {
@@ -135,7 +144,8 @@ class QueensGameFragment : Fragment() {
             }
             if (it is GameStatus.Win) {
                 stopChronometer()
-                WinDialogFragment(viewModel.calculatePrize()
+                WinDialogFragment(
+                    viewModel.calculatePrize()
                 ) { _, which: Int ->
                     when (which) {
                         DialogInterface.BUTTON_POSITIVE -> {
@@ -143,6 +153,7 @@ class QueensGameFragment : Fragment() {
                             viewModel.time = 0
                             startChronometer()
                         }
+
                         DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
                     }
                 }.show(childFragmentManager, "WinDialog")
@@ -150,27 +161,31 @@ class QueensGameFragment : Fragment() {
         }
 
         viewModel.hint.observe(viewLifecycleOwner) {
-            when(it) {
+            when (it) {
                 is QueensHint.ExclusionZone -> {
                     boardAdapter.updateHighlights(
                         greenPositions = it.zone,
                         redPositions = it.exclusion
                     )
                     binding.messageTextView.text =
-                        getString(R.string.queens_exclusion_zone_hint_text,
+                        getString(
+                            R.string.queens_exclusion_zone_hint_text,
                             it.queensAmount.toString() +
                                     if (it.queensAmount == 1)
                                         " королева"
                                     else if (it.queensAmount < 5)
                                         " королевы"
                                     else
-                                        " королев")
+                                        " королев"
+                        )
                 }
+
                 is QueensHint.MissingCrosses -> {
                     boardAdapter.updateHighlights(greenPositions = it.positions)
                     binding.messageTextView.text =
                         getString(R.string.queens_missing_crosses_hint_text)
                 }
+
                 is QueensHint.OneEmptyInColumn -> {
                     boardAdapter.updateHighlights(
                         greenPositions = listOf(it.empty),
@@ -179,6 +194,7 @@ class QueensGameFragment : Fragment() {
                     binding.messageTextView.text =
                         getString(R.string.queens_one_in_column_hint_text)
                 }
+
                 is QueensHint.OneEmptyInRow -> {
                     boardAdapter.updateHighlights(
                         greenPositions = listOf(it.empty),
@@ -187,6 +203,7 @@ class QueensGameFragment : Fragment() {
                     binding.messageTextView.text =
                         getString(R.string.queens_one_in_row_hint_text)
                 }
+
                 is QueensHint.RuleBreakingPlacement -> {
                     boardAdapter.updateHighlights(
                         greenPositions = listOf(it.position),
@@ -195,6 +212,7 @@ class QueensGameFragment : Fragment() {
                     binding.messageTextView.text =
                         getString(R.string.queens_rule_breaking_placement_hint_text)
                 }
+
                 is QueensHint.Undefined -> {
                     boardAdapter.updateHighlights()
                     binding.messageTextView.text = getString(R.string.undefined_hint_text)
@@ -233,8 +251,10 @@ class QueensGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.updateBoard(requireArguments().getBoolean("fromDataStore"),
-            requireArguments().getInt("boardSize"))
+        viewModel.updateBoard(
+            requireArguments().getBoolean("fromDataStore"),
+            requireArguments().getInt("boardSize")
+        )
     }
 
     private fun startChronometer() {
@@ -259,7 +279,7 @@ class QueensGameFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        if(viewModel.status.value != GameStatus.Win) {
+        if (viewModel.status.value != GameStatus.Win) {
             viewModel.cache()
         }
     }
