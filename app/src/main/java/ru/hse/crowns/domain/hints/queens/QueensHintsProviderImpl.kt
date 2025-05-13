@@ -99,7 +99,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
         return null
     }
 
-    private fun findExclusionRowsZone(board: QueensBoard): QueensHint.ExclusionZone? {
+    private fun findExclusionRowsZone(board: QueensBoard): QueensHint.RowExclusionZone? {
         val emptyCounts = Array<MutableList<Int>>(board.size) { mutableListOf() }
         for (rowId in 0 until board.size) {
             emptyCounts[rowId].addAll(
@@ -131,7 +131,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                     pos !in zone && board.getStatus(pos.first, pos.second) == QueenCellStatus.EMPTY
                 }
             ) {
-                return QueensHint.ExclusionZone(
+                return QueensHint.RowExclusionZone(
                     zone,
                     exclusion,
                     key.size
@@ -141,7 +141,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
         return null
     }
 
-    private fun findExclusionColumnsZone(board: QueensBoard): QueensHint.ExclusionZone? {
+    private fun findExclusionColumnsZone(board: QueensBoard): QueensHint.ColumnExclusionZone? {
         val emptyCounts = Array<MutableList<Int>>(board.size) { mutableListOf() }
         for (colId in 0 until board.size) {
             emptyCounts[colId].addAll(
@@ -173,7 +173,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                     pos !in zone && board.getStatus(pos.first, pos.second) == QueenCellStatus.EMPTY
                 }
             ) {
-                return QueensHint.ExclusionZone(
+                return QueensHint.ColumnExclusionZone(
                     zone,
                     exclusion,
                     key.size
@@ -183,7 +183,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
         return null
     }
 
-    private fun findExclusionPolyominoZone(board: QueensBoard): QueensHint.ExclusionZone? {
+    private fun findExclusionPolyominoZone(board: QueensBoard): QueensHint.PolyominoExclusionZone? {
         val polyominoSubsets = (0 until board.getPolyominoCount()).toSet().getPowerSet().filter {
             it.isNotEmpty() && it.size < board.getPolyominoCount()
         }
@@ -220,7 +220,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                             it.second
                         ) == QueenCellStatus.EMPTY
                     }) {
-                    return QueensHint.ExclusionZone(
+                    return QueensHint.PolyominoExclusionZone(
                         zone = zone,
                         exclusion = exclusion,
                         queensAmount = subset.size
@@ -241,7 +241,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                             it.second
                         ) == QueenCellStatus.EMPTY
                     }) {
-                    return QueensHint.ExclusionZone(
+                    return QueensHint.PolyominoExclusionZone(
                         zone = zone,
                         exclusion = exclusion,
                         queensAmount = subset.size

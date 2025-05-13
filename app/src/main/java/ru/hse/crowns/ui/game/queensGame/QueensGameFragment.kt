@@ -162,14 +162,50 @@ class QueensGameFragment : Fragment() {
 
         viewModel.hint.observe(viewLifecycleOwner) {
             when (it) {
-                is QueensHint.ExclusionZone -> {
+                is QueensHint.RowExclusionZone -> {
                     boardAdapter.updateHighlights(
                         greenPositions = it.zone,
                         redPositions = it.exclusion
                     )
                     binding.messageTextView.text =
                         getString(
-                            R.string.queens_exclusion_zone_hint_text,
+                            R.string.queens_row_exclusion_zone_hint_text,
+                            it.queensAmount.toString() +
+                                    if (it.queensAmount == 1)
+                                        " королева"
+                                    else if (it.queensAmount < 5)
+                                        " королевы"
+                                    else
+                                        " королев"
+                        )
+                }
+
+                is QueensHint.ColumnExclusionZone -> {
+                    boardAdapter.updateHighlights(
+                        greenPositions = it.zone,
+                        redPositions = it.exclusion
+                    )
+                    binding.messageTextView.text =
+                        getString(
+                            R.string.queens_column_exclusion_zone_hint_text,
+                            it.queensAmount.toString() +
+                                    if (it.queensAmount == 1)
+                                        " королева"
+                                    else if (it.queensAmount < 5)
+                                        " королевы"
+                                    else
+                                        " королев"
+                        )
+                }
+
+                is QueensHint.PolyominoExclusionZone -> {
+                    boardAdapter.updateHighlights(
+                        greenPositions = it.zone,
+                        redPositions = it.exclusion
+                    )
+                    binding.messageTextView.text =
+                        getString(
+                            R.string.queens_polyomino_exclusion_zone_hint_text,
                             it.queensAmount.toString() +
                                     if (it.queensAmount == 1)
                                         " королева"

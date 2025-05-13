@@ -121,14 +121,32 @@ class NQueensGameFragment : Fragment() {
 
         viewModel.hint.observe(viewLifecycleOwner) {
             when (it) {
-                is NQueensHint.ExclusionZone -> {
+                is NQueensHint.RowExclusionZone -> {
                     boardAdapter.updateHighlights(
                         greenPositions = it.zone,
                         redPositions = it.exclusion
                     )
                     binding.messageTextView.text =
                         getString(
-                            R.string.n_queens_exclusion_zone_hint_text,
+                            R.string.n_queens_row_exclusion_zone_hint_text,
+                            it.queensAmount.toString() +
+                                    if (it.queensAmount == 1)
+                                        " ферзь"
+                                    else if (it.queensAmount < 5)
+                                        " ферзя"
+                                    else
+                                        " ферзей"
+                        )
+                }
+
+                is NQueensHint.ColumnExclusionZone -> {
+                    boardAdapter.updateHighlights(
+                        greenPositions = it.zone,
+                        redPositions = it.exclusion
+                    )
+                    binding.messageTextView.text =
+                        getString(
+                            R.string.n_queens_column_exclusion_zone_hint_text,
                             it.queensAmount.toString() +
                                     if (it.queensAmount == 1)
                                         " ферзь"
