@@ -57,12 +57,12 @@
             app:argType="boolean" />
         <argument
             android:name="difficultyLevel"
-            app:argType="integer"
-            android:defaultValue="0" />
+            android:defaultValue="0"
+            app:argType="integer" />
         <argument
             android:name="fromDataStore"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/NQueensGameFragment"
@@ -75,12 +75,12 @@
             app:argType="boolean" />
         <argument
             android:name="boardSize"
-            app:argType="integer"
-            android:defaultValue="5"/>
+            android:defaultValue="5"
+            app:argType="integer" />
         <argument
             android:name="fromDataStore"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/queensGameFragment"
@@ -93,11 +93,21 @@
             app:argType="boolean" />
         <argument
             android:name="boardSize"
-            app:argType="integer"
-            android:defaultValue="5" />
+            android:defaultValue="5"
+            app:argType="integer" />
         <argument
             android:name="fromDataStore"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/guideFragment"
+        android:name="ru.hse.crowns.ui.guide.GuideFragment"
+        android:label="fragment_guide"
+        tools:layout="@layout/fragment_guide">
+        <argument
+            android:name="ShowBottomBar"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
 </navigation>
