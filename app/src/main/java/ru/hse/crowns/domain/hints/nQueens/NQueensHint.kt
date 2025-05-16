@@ -13,7 +13,13 @@ sealed class NQueensHint() {
         val ruleBreakingPositions: Iterable<Pair<Int, Int>>
     ) : NQueensHint()
 
-    class ExclusionZone(
+    class RowExclusionZone(
+        val zone: Iterable<Pair<Int, Int>>,
+        val exclusion: Iterable<Pair<Int, Int>>,
+        val queensAmount: Int
+    ) : NQueensHint()
+
+    class ColumnExclusionZone(
         val zone: Iterable<Pair<Int, Int>>,
         val exclusion: Iterable<Pair<Int, Int>>,
         val queensAmount: Int

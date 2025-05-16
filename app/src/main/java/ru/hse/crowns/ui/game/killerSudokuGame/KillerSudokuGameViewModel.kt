@@ -1,6 +1,5 @@
 package ru.hse.crowns.ui.game.killerSudokuGame
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -99,6 +98,12 @@ class KillerSudokuGameViewModel(
         }
     }
 
+    /**
+     * Initialize board, if it has not been initialized yet.
+     * @param fromDataStore True, if board must be read from data store.
+     * False, if it must be generated.
+     * @param level difficulty level
+     */
     fun updateBoard(fromDataStore: Boolean, level: KillerSudokuDifficultyLevel) {
         if (!boardLD.isInitialized) {
             if (fromDataStore) {
@@ -110,6 +115,14 @@ class KillerSudokuGameViewModel(
         }
     }
 
+    /**
+     * On cell clicked callback
+     * @param row row of clicked cell
+     * @param column column of clicked cell
+     * @param value value to set
+     * @param eraseMode true if erase mode is active, else false
+     * @param noteMode true if note mode is active, else false
+     */
     fun onCellClick(row: Int, column: Int, value: Int, eraseMode: Boolean, noteMode: Boolean) {
         boardLD.value?.let { board ->
             if (!board.isOriginal(row, column)) {
@@ -130,11 +143,14 @@ class KillerSudokuGameViewModel(
                 }
             }
 
+            // Check for mistakes
             val mistake: KillerSudokuMistake? = boardValidator.check(board)
             if (mistake != null) {
                 _mistakeCounter.value = (_mistakeCounter.value ?: 0) + 1
                 _status.value = mistake!!
-            } else if (board.emptyCellsCount == 0) {
+            }
+            // Check for winning
+            else if (board.emptyCellsCount == 0) {
                 _status.value = GameStatus.Win
                 clearCache()
             } else {
@@ -143,6 +159,10 @@ class KillerSudokuGameViewModel(
         }
     }
 
+    /**
+     * Increase coins balance
+     * @param prize the number of coins by which the balance will be increased
+     */
     private fun increaseBalance(prize: Int) = viewModelScope.launch(Dispatchers.IO) {
         balanceRepository.increaseCoinsBalance(prize)
     }
@@ -151,6 +171,9 @@ class KillerSudokuGameViewModel(
         gameDataMapper.removeData()
     }
 
+    /**
+     * @return number of coins won
+     */
     fun calculatePrize(): Int {
         val prize = PrizeCalculator.calculate(
             time = (time / 60_000).toInt(),
@@ -166,6 +189,9 @@ class KillerSudokuGameViewModel(
         return prize
     }
 
+    /**
+     * Generate new board, reset hint and mistake counters to zero, switch status to neutral
+     */
     fun startNewGame() {
         generateBoard(level)
         _hintCounter.value = 0
@@ -173,6 +199,9 @@ class KillerSudokuGameViewModel(
         _status.value = GameStatus.Neutral
     }
 
+    /**
+     * Save current game state
+     */
     fun cache(level: Int) = viewModelScope.launch(Dispatchers.Default) {
         withContext(NonCancellable) {
             gameDataMapper.saveGameData(
@@ -182,10 +211,12 @@ class KillerSudokuGameViewModel(
                 mistakeCount = mistakeCounter.value!!,
                 level = level
             )
-            Log.d("save", "sudoku data saved")
         }
     }
 
+    /**
+     * Try to provide a hint
+     */
     fun getHint() {
         boardLD.value?.let { board ->
             _isMessageLoading.value = true
@@ -193,8 +224,10 @@ class KillerSudokuGameViewModel(
                 val hint = hintsProvider.provideHint(board)
                 launch(Dispatchers.Main) {
                     if (hint !is KillerSudokuHint.Undefined) {
+                        // Increase hint counter
                         _hintCounter.value = _hintCounter.value?.plus(1)
                         if (_hintCounter.value!! > 1) {
+                            // If the hint is not first, decrease coins balance
                             balanceRepository.decreaseCoinsBalance(HINT_PRICE)
                         }
                     }
@@ -205,6 +238,9 @@ class KillerSudokuGameViewModel(
         }
     }
 
+    /**
+     * Rerun current level, reset hint and mistake counters to zero, switch status to neutral
+     */
     fun rerun() {
         _isBoardLoading.value = true
         boardLD.value?.backToOriginal()

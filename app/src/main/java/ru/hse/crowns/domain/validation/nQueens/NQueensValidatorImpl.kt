@@ -8,6 +8,7 @@ class NQueensValidatorImpl : NQueensValidator {
 
     override fun check(board: NQueensBoard): NQueensMistake? {
         val queens: List<Pair<Int, Int>> = board.getQueenPositions()
+        // Check for several queens in one row
         for (row in 0 until board.size) {
             val rowQueens = queens.filter { queen: Pair<Int, Int> -> queen.first == row }
             if (rowQueens.size > 1) {
@@ -15,6 +16,7 @@ class NQueensValidatorImpl : NQueensValidator {
             }
         }
 
+        // Check for several queens in one column
         for (column in 0 until board.size) {
             val columnQueens = queens.filter { queen: Pair<Int, Int> -> queen.second == column }
             if (columnQueens.size > 1) {
@@ -22,6 +24,7 @@ class NQueensValidatorImpl : NQueensValidator {
             }
         }
 
+        // Check for several queens in one diagonal
         for (diagonal in 0 until 2 * board.size - 1) {
             val upQueens =
                 queens.filter { queen: Pair<Int, Int> -> queen.first + queen.second == diagonal }
@@ -35,12 +38,14 @@ class NQueensValidatorImpl : NQueensValidator {
             }
         }
 
+        // Check for empty row
         for (rowIndex in 0 until board.size) {
             if (board.getRow(rowIndex).all { status -> status == QueenCellStatus.CROSS }) {
                 return NQueensMistake.EmptyRow((0 until board.size).map { Pair(rowIndex, it) })
             }
         }
 
+        // Check for empty column
         for (columnIndex in 0 until board.size) {
             if (board.getColumn(columnIndex).all { status -> status == QueenCellStatus.CROSS }) {
                 return NQueensMistake.EmptyColumn((0 until board.size).map {

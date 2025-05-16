@@ -12,6 +12,10 @@ import ru.hse.crowns.domain.domainObjects.boards.QueensBoard
 import ru.hse.crowns.databinding.BoardCellBinding
 import ru.hse.crowns.domain.domainObjects.boards.QueenCellStatus
 
+/**
+ * RecyclerView adapter for queens board
+ * @param onItemClick on board cell click callback
+ */
 class QueensBoardRecyclerAdapter(
     private val onItemClick: (row: Int, column: Int) -> Unit
 ) : RecyclerView.Adapter<BoardCellViewHolder>() {
@@ -166,7 +170,7 @@ class QueensBoardRecyclerAdapter(
                     }
 
                     Payload.HIGHLIGHT_RED -> holder.highlightRed()
-                    Payload.HIGHLIGHT_GREEN -> holder.highLightGreen()
+                    Payload.HIGHLIGHT_GREEN -> holder.highlightGreen()
                     Payload.REMOVE_HIGHLIGHT -> holder.removeHighlightColor()
                 }
             }

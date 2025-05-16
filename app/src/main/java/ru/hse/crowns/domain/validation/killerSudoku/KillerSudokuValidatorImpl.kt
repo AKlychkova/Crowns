@@ -6,6 +6,7 @@ import ru.hse.crowns.utils.getPowerSet
 
 class KillerSudokuValidatorImpl : KillerSudokuValidator {
     override fun check(board: KillerSudokuBoard): KillerSudokuMistake? {
+        // Check for same values in row
         for (index in 0 until board.size) {
             val row = board.getRow(index)
             for (value in board.values) {
@@ -20,6 +21,7 @@ class KillerSudokuValidatorImpl : KillerSudokuValidator {
             }
         }
 
+        // Check for same values in column
         for (index in 0 until board.size) {
             val column = board.getColumn(index)
             for (value in board.values) {
@@ -34,6 +36,7 @@ class KillerSudokuValidatorImpl : KillerSudokuValidator {
             }
         }
 
+        // Check for same values in box
         for (boxId in 0 until board.boxesInRow * board.boxesInRow) {
             val boxValues = board.getBox(boxId).toList()
             for (value in board.values) {
@@ -51,8 +54,9 @@ class KillerSudokuValidatorImpl : KillerSudokuValidator {
             }
         }
 
+        // Check polyomino sums
         for (polyominoId in 0 until board.getPolyominoCount()) {
-            var sum: Int = 0
+            var sum = 0
             var free = 0
             val polyominoValues = mutableListOf<Int>()
             for (coordinates in board.getPolyominoCoordinates(polyominoId)) {
@@ -77,6 +81,7 @@ class KillerSudokuValidatorImpl : KillerSudokuValidator {
             }
         }
 
+        // Check same values in polyomino
         for (polyominoId in 0 until board.getPolyominoCount()) {
             val coordinates = board.getPolyominoCoordinates(polyominoId)
             for (value in board.values) {

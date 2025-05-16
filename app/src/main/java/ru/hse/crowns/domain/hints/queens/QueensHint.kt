@@ -18,7 +18,19 @@ sealed class QueensHint() {
         val ruleBreakingPositions: Iterable<Pair<Int, Int>>
     ) : QueensHint()
 
-    class ExclusionZone(
+    class RowExclusionZone(
+        val zone: Iterable<Pair<Int, Int>>,
+        val exclusion: Iterable<Pair<Int, Int>>,
+        val queensAmount: Int
+    ) : QueensHint()
+
+    class ColumnExclusionZone(
+        val zone: Iterable<Pair<Int, Int>>,
+        val exclusion: Iterable<Pair<Int, Int>>,
+        val queensAmount: Int
+    ) : QueensHint()
+
+    class PolyominoExclusionZone(
         val zone: Iterable<Pair<Int, Int>>,
         val exclusion: Iterable<Pair<Int, Int>>,
         val queensAmount: Int

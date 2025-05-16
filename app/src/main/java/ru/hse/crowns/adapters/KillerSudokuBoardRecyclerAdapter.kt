@@ -11,6 +11,10 @@ import ru.hse.crowns.R
 import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
 import ru.hse.crowns.databinding.BoardCellBinding
 
+/**
+ * RecyclerView adapter for killer sudoku board
+ * @param onItemClick on board cell click callback
+ */
 class KillerSudokuBoardRecyclerAdapter(
     private val onItemClick: (row: Int, column: Int) -> Unit
 ) : RecyclerView.Adapter<BoardCellViewHolder>() {
@@ -34,6 +38,10 @@ class KillerSudokuBoardRecyclerAdapter(
         HIGHLIGHT_GREEN
     }
 
+    /**
+     * Set new [board][newBoard]
+     * @param newBoard new board that will be displayed in the recyclerview
+     */
     @SuppressLint("NotifyDataSetChanged")
     fun setBoard(newBoard: KillerSudokuBoard) {
         board = newBoard
@@ -41,13 +49,19 @@ class KillerSudokuBoardRecyclerAdapter(
     }
 
     /**
-     * Update cell with coordinates ([row], [column])
+     * Update value of cell with coordinates ([row], [column])
      */
     fun updateCellValue(row: Int, column: Int) {
         notifyItemChanged(row * board.size + column, Payload.VALUE)
         notifyItemChanged(row * board.size + column, Payload.NOTES)
     }
 
+    /**
+     * Highlight [greenPositions] with green color and [redPositions] with red color.
+     * If position is in [greenPositions] and in [redPositions], green color is dominant.
+     * @param greenPositions positions that will be colored green
+     * @param redPositions positions that will be colored red
+     */
     fun updateHighlights(greenPositions: Iterable<Pair<Int, Int>> = emptyList(),
                          redPositions: Iterable<Pair<Int, Int>> = emptyList()) {
         val green = greenPositions.map { it.first * board.size + it.second}.toSet()
@@ -189,7 +203,7 @@ class KillerSudokuBoardRecyclerAdapter(
 
                     Payload.HIGHLIGHT_RED -> holder.highlightRed()
                     Payload.REMOVE_HIGHLIGHT -> holder.removeHighlightColor()
-                    Payload.HIGHLIGHT_GREEN -> holder.highLightGreen()
+                    Payload.HIGHLIGHT_GREEN -> holder.highlightGreen()
                 }
             }
         } else {

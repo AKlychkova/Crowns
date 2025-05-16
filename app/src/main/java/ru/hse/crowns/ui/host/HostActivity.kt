@@ -1,8 +1,6 @@
 package ru.hse.crowns.ui.host
 
-import android.content.Context
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -27,7 +25,12 @@ class HostActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         binding.navView.setupWithNavController(navController)
 
-        // Set up colors change
+        // Set up guide screen navigation
+        binding.guideImageButton.setOnClickListener {
+            navController.navigate(R.id.guideFragment)
+        }
+
+        // Set up navigation bar color change
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.navigation_n_queens -> {
@@ -55,6 +58,17 @@ class HostActivity : AppCompatActivity() {
                         resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
                     binding.navView.itemRippleColor =
                         resources.getColorStateList(R.color.nav_bar_killer_sudoku_tint, null)
+                }
+
+                R.id.guideFragment -> {
+                    binding.guideImageButton.setImageResource(R.drawable.ic_arrow_back_24dp)
+                    binding.guideImageButton.setOnClickListener {
+                        navController.popBackStack()
+                        binding.guideImageButton.setImageResource(R.drawable.ic_question_mark_24dp)
+                        binding.guideImageButton.setOnClickListener {
+                            navController.navigate(R.id.guideFragment)
+                        }
+                    }
                 }
             }
         }

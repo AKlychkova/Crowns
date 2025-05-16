@@ -60,8 +60,17 @@ class KillerSudokuMapper(private val repository: KillerSudokuGameRepository) {
         return board
     }
 
+    /**
+     * Map to DTO and save to data store
+     * @param board game board
+     * @param time time since the beginning of the solution
+     * @param hintCount the number of taken hints
+     * @param mistakeCount the number of mistakes
+     * @param level difficulty level
+     */
     suspend fun saveGameData(board: KillerSudokuBoard,
-                             time: Long, hintCount: Int,
+                             time: Long,
+                             hintCount: Int,
                              mistakeCount: Int,
                              level : Int) {
         val game = KillerSudokuGameDTO.newBuilder()
@@ -79,12 +88,18 @@ class KillerSudokuMapper(private val repository: KillerSudokuGameRepository) {
         }
     }
 
+    /**
+     * @return board from data source
+     */
     suspend fun getBoard(): KillerSudokuBoard {
         return mapBoard(
             withContext(Dispatchers.IO) {repository.getData()!!}
         )
     }
 
+    /**
+     * @return [GameCharacteristics] from data source
+     */
     suspend fun getGameData(): GameCharacteristics {
         val game: KillerSudokuGameDTO = withContext(Dispatchers.IO) {repository.getData()!!}
         return GameCharacteristics(
@@ -94,10 +109,16 @@ class KillerSudokuMapper(private val repository: KillerSudokuGameRepository) {
         )
     }
 
+    /**
+     * @return [KillerSudokuDifficultyLevel] from data source
+     */
     suspend fun getLevel() : KillerSudokuDifficultyLevel {
         return KillerSudokuDifficultyLevel.entries[repository.getData()!!.level]
     }
 
+    /**
+     * Remove data from data source
+     */
     suspend fun removeData() {
         repository.removeData()
     }

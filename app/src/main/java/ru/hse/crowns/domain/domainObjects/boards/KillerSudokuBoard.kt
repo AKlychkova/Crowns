@@ -485,6 +485,9 @@ class KillerSudokuBoard internal constructor(
         return column
     }
 
+    /**
+     * Clear all not original cells
+     */
     fun backToOriginal() {
         for(i in 0 until size) {
             for(j in 0 until size) {
