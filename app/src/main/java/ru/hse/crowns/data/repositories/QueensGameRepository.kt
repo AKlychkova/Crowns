@@ -14,12 +14,21 @@ class QueensGameRepository (private val dataStore: DataStore<QueensGameDTO>) {
             data
     }
 
+    /**
+     * @return [QueensGameDTO] with data from DataStore
+     */
     suspend fun getData() : QueensGameDTO? = gameFlow.firstOrNull()
 
+    /**
+     * Update data in DataStore
+     */
     suspend fun updateData(data : QueensGameDTO) {
         dataStore.updateData { data }
     }
 
+    /**
+     * Clear data in DataStore
+     */
     suspend fun removeData() {
         dataStore.updateData { QueensGameDTO.getDefaultInstance() }
     }

@@ -3,7 +3,6 @@ package ru.hse.crowns.adapters
 import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
 import androidx.core.graphics.toColorInt
@@ -33,6 +32,12 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         binding.noteTextView9,
     )
 
+    /**
+     * Set [picture] as the value of the cell
+     * @param picture value picture
+     * @param description content description
+     * @param tint tint of the picture
+     */
     fun setValuePicture(picture: Drawable?, description: String, tint: Color? = null) {
         binding.valueImageView.setImageDrawable(picture)
         binding.valueImageView.contentDescription = description
@@ -56,6 +61,9 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         binding.additionalInfoTextView.text = text
     }
 
+    /**
+     * If left board is not bold, double its thickness
+     */
     fun makeLeftBorderBold() {
         if (!isLeftBorderBold) {
             if (binding.backgroundCardView.layoutParams is MarginLayoutParams) {
@@ -68,6 +76,9 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         }
     }
 
+    /**
+     * If right board is not bold, double its thickness
+     */
     fun makeRightBorderBold() {
         if (!isRightBorderBold) {
             if (binding.backgroundCardView.layoutParams is MarginLayoutParams) {
@@ -80,6 +91,9 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         }
     }
 
+    /**
+     * If bottom board is not bold, double its thickness
+     */
     fun makeBottomBorderBold() {
         if (!isBottomBorderBold) {
             if (binding.backgroundCardView.layoutParams is MarginLayoutParams) {
@@ -92,6 +106,9 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         }
     }
 
+    /**
+     * If top board is not bold, double its thickness
+     */
     fun makeTopBorderBold() {
         if (!isUpBorderBold) {
             if (binding.backgroundCardView.layoutParams is MarginLayoutParams) {
@@ -124,16 +141,25 @@ class BoardCellViewHolder(private val binding: BoardCellBinding) :
         }
     }
 
+    /**
+     * Apply red color
+     */
     fun highlightRed() {
         val color: Int = itemView.resources.getColor(R.color.mistake, null)
         binding.highlightView.setBackgroundColor(color)
     }
 
+    /**
+     * Clear highlight color
+     */
     fun removeHighlightColor() {
         binding.highlightView.background = null
     }
 
-    fun highLightGreen() {
+    /**
+     * Apply green color
+     */
+    fun highlightGreen() {
         val color: Int = itemView.resources.getColor(R.color.highlight, null)
         binding.highlightView.setBackgroundColor(color)
     }

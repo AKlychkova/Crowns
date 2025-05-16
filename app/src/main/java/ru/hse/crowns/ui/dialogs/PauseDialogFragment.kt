@@ -1,13 +1,20 @@
 package ru.hse.crowns.ui.dialogs
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import ru.hse.crowns.R
 
-class PauseDialogFragment (private val onClickListener: OnClickListener) : DialogFragment() {
+/**
+ * @property onCancel on cancel dialog callback
+ */
+class PauseDialogFragment (
+    private val onClickListener: OnClickListener,
+    private val onCancel: () -> Unit
+) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
@@ -17,5 +24,10 @@ class PauseDialogFragment (private val onClickListener: OnClickListener) : Dialo
                 .setNeutralButton(getString(R.string.menu), onClickListener)
             builder.create()
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        onCancel()
+        super.onCancel(dialog)
     }
 }

@@ -58,6 +58,13 @@ class NQueensMapper(private val repository: NQueensGameRepository) {
         return board
     }
 
+    /**
+     * Map to DTO and save to data source
+     * @param board game board
+     * @param time time since the beginning of the solution
+     * @param hintCount the number of taken hints
+     * @param mistakeCount the number of mistakes
+     */
     suspend fun saveGameData(board: NQueensBoard, time: Long, hintCount: Int, mistakeCount: Int) {
         val game = NQueensGameDTO.newBuilder()
             .setTime(time)
@@ -70,6 +77,9 @@ class NQueensMapper(private val repository: NQueensGameRepository) {
         }
     }
 
+    /**
+     * @return board from data source
+     */
     suspend fun getBoard(): NQueensBoard {
         return mapCellsToBoard(
             withContext(Dispatchers.IO) {
@@ -78,6 +88,9 @@ class NQueensMapper(private val repository: NQueensGameRepository) {
         )
     }
 
+    /**
+     * @return [GameCharacteristics] from data source
+     */
     suspend fun getGameCharacteristic(): GameCharacteristics {
         val game: NQueensGameDTO = withContext(Dispatchers.IO) { repository.getData()!! }
         return GameCharacteristics(
@@ -87,6 +100,9 @@ class NQueensMapper(private val repository: NQueensGameRepository) {
         )
     }
 
+    /**
+     * Remove data from data source
+     */
     suspend fun removeData() {
         repository.removeData()
     }

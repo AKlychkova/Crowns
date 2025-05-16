@@ -7,7 +7,6 @@ import ru.hse.crowns.domain.validation.nQueens.NQueensValidator
 import ru.hse.crowns.utils.max
 import ru.hse.crowns.utils.min
 import ru.hse.crowns.utils.plus
-import kotlin.math.max
 import kotlin.math.min
 
 class NQueensHintsProviderImpl(private val validator: NQueensValidator) : NQueensHintsProvider {
@@ -76,7 +75,7 @@ class NQueensHintsProviderImpl(private val validator: NQueensValidator) : NQueen
         return null
     }
 
-    private fun findExclusionRowsZone(board: NQueensBoard): NQueensHint.ExclusionZone? {
+    private fun findExclusionRowsZone(board: NQueensBoard): NQueensHint.RowExclusionZone? {
         val emptyCounts = Array<MutableList<Int>>(board.size) { mutableListOf() }
         for (rowId in 0 until board.size) {
             emptyCounts[rowId].addAll(
@@ -108,7 +107,7 @@ class NQueensHintsProviderImpl(private val validator: NQueensValidator) : NQueen
                     pos !in zone && board.getStatus(pos.first, pos.second) == QueenCellStatus.EMPTY
                 }
             ) {
-                return NQueensHint.ExclusionZone(
+                return NQueensHint.RowExclusionZone(
                     zone,
                     exclusion,
                     key.size
@@ -118,7 +117,7 @@ class NQueensHintsProviderImpl(private val validator: NQueensValidator) : NQueen
         return null
     }
 
-    private fun findExclusionColumnsZone(board: NQueensBoard): NQueensHint.ExclusionZone? {
+    private fun findExclusionColumnsZone(board: NQueensBoard): NQueensHint.ColumnExclusionZone? {
         val emptyCounts = Array<MutableList<Int>>(board.size) { mutableListOf() }
         for (colId in 0 until board.size) {
             emptyCounts[colId].addAll(
@@ -150,7 +149,7 @@ class NQueensHintsProviderImpl(private val validator: NQueensValidator) : NQueen
                     pos !in zone && board.getStatus(pos.first, pos.second) == QueenCellStatus.EMPTY
                 }
             ) {
-                return NQueensHint.ExclusionZone(
+                return NQueensHint.ColumnExclusionZone(
                     zone,
                     exclusion,
                     key.size
@@ -209,7 +208,7 @@ class NQueensHintsProviderImpl(private val validator: NQueensValidator) : NQueen
     }
 
     override fun provideHint(board: NQueensBoard): NQueensHint {
-        var positions = findMissingCrosses(board).toList()
+        val positions = findMissingCrosses(board).toList()
         if (positions.isNotEmpty()) {
             return NQueensHint.MissingCrosses(positions)
         }

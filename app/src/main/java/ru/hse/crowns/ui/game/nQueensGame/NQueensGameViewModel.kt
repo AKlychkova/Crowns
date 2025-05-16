@@ -96,6 +96,12 @@ class NQueensGameViewModel(
         }
     }
 
+    /**
+     * Initialize board, if it has not been initialized yet.
+     * @param fromDataStore True, if board must be read from data store.
+     * False, if it must be generated.
+     * @param boardSize size of a board
+     */
     fun updateBoard(fromDataStore: Boolean, boardSize: Int) {
         if (!boardLD.isInitialized) {
             if(fromDataStore) {
@@ -106,6 +112,13 @@ class NQueensGameViewModel(
         }
     }
 
+    /**
+     * On cell clicked callback
+     * @param row row of clicked cell
+     * @param column column of clicked cell
+     * @param eraseMode true if erase mode is active, else false
+     * @param noteMode true if note mode is active, else false
+     */
     fun onCellClick(row: Int, column: Int, eraseMode: Boolean, noteMode: Boolean) {
         boardLD.value?.let { board ->
             val status = board.getStatus(row, column)
@@ -136,6 +149,9 @@ class NQueensGameViewModel(
         }
     }
 
+    /**
+     * @return number of coins won
+     */
     fun calculatePrize(): Int {
         val prize = PrizeCalculator.calculate(
             time = (time / 60_000).toInt(),
@@ -147,10 +163,17 @@ class NQueensGameViewModel(
         return prize
     }
 
+    /**
+     * Increase coins balance
+     * @param prize the number of coins by which the balance will be increased
+     */
     private fun increaseBalance(prize: Int) = viewModelScope.launch(Dispatchers.IO) {
         balanceRepository.increaseCoinsBalance(prize)
     }
 
+    /**
+     * Generate new board and reset hint and mistake counters to zero
+     */
     fun startNewGame() {
         _hintCounter.value = 0
         _mistakeCounter.value = 0
@@ -158,6 +181,9 @@ class NQueensGameViewModel(
         generateBoard(boardLD.value!!.size)
     }
 
+    /**
+     * Save current game state
+     */
     fun cache() = viewModelScope.launch(Dispatchers.Default) {
         withContext(NonCancellable) {
             gameDataMapper.saveGameData(
@@ -170,6 +196,9 @@ class NQueensGameViewModel(
         }
     }
 
+    /**
+     * Try to provide a hint
+     */
     fun getHint() {
         boardLD.value?.let { board ->
             _isMessageLoading.value = true
@@ -189,6 +218,9 @@ class NQueensGameViewModel(
         }
     }
 
+    /**
+     * Rerun current level, reset hint and mistake counters to zero, switch status to neutral
+     */
     fun rerun() {
         _isBoardLoading.value = true
         boardLD.value?.backToOriginal()

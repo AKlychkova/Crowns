@@ -99,7 +99,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
         return null
     }
 
-    private fun findExclusionRowsZone(board: QueensBoard): QueensHint.ExclusionZone? {
+    private fun findExclusionRowsZone(board: QueensBoard): QueensHint.RowExclusionZone? {
         val emptyCounts = Array<MutableList<Int>>(board.size) { mutableListOf() }
         for (rowId in 0 until board.size) {
             emptyCounts[rowId].addAll(
@@ -131,7 +131,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                     pos !in zone && board.getStatus(pos.first, pos.second) == QueenCellStatus.EMPTY
                 }
             ) {
-                return QueensHint.ExclusionZone(
+                return QueensHint.RowExclusionZone(
                     zone,
                     exclusion,
                     key.size
@@ -141,7 +141,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
         return null
     }
 
-    private fun findExclusionColumnsZone(board: QueensBoard): QueensHint.ExclusionZone? {
+    private fun findExclusionColumnsZone(board: QueensBoard): QueensHint.ColumnExclusionZone? {
         val emptyCounts = Array<MutableList<Int>>(board.size) { mutableListOf() }
         for (colId in 0 until board.size) {
             emptyCounts[colId].addAll(
@@ -173,7 +173,7 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                     pos !in zone && board.getStatus(pos.first, pos.second) == QueenCellStatus.EMPTY
                 }
             ) {
-                return QueensHint.ExclusionZone(
+                return QueensHint.ColumnExclusionZone(
                     zone,
                     exclusion,
                     key.size
@@ -183,22 +183,28 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
         return null
     }
 
-    private fun findExclusionPolyominoZone(board: QueensBoard): QueensHint.ExclusionZone? {
+    private fun findExclusionPolyominoZone(board: QueensBoard): QueensHint.PolyominoExclusionZone? {
         val polyominoSubsets = (0 until board.getPolyominoCount()).toSet().getPowerSet().filter {
             it.isNotEmpty() && it.size < board.getPolyominoCount()
         }
         for (subset in polyominoSubsets) {
+            val coordinates = subset.map { polyominoId ->
+                board.getPolyominoCoordinates(polyominoId)
+                    .filter { board.getStatus(it.first, it.second) == QueenCellStatus.EMPTY }
+            }
+            if (coordinates.any { it.isEmpty() }) {
+                continue
+            }
             var minRow: Int = board.size
             var maxRow: Int = -1
             var minCol: Int = board.size
             var maxCol: Int = -1
 
-            for (polyominoId in subset) {
-                val coordinates = board.getPolyominoCoordinates(polyominoId)
-                minRow = min(minRow, coordinates.minOf { it.first })
-                maxRow = max(maxRow, coordinates.maxOf { it.first })
-                minCol = min(minCol, coordinates.minOf { it.second })
-                maxCol = max(maxCol, coordinates.maxOf { it.second })
+            for (polyomino in coordinates) {
+                minRow = min(minRow, polyomino.minOf { it.first })
+                maxRow = max(maxRow, polyomino.maxOf { it.first })
+                minCol = min(minCol, polyomino.minOf { it.second })
+                maxCol = max(maxCol, polyomino.maxOf { it.second })
             }
 
             if (subset.size == maxRow - minRow + 1) {
@@ -207,14 +213,14 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                         Pair(rowId, colId)
                     }
                 }.flatten()
-                val zone = subset.map { pId -> board.getPolyominoCoordinates(pId) }.flatten()
+                val zone = coordinates.flatten()
                 if (exclusion.any {
                         it !in zone && board.getStatus(
                             it.first,
                             it.second
                         ) == QueenCellStatus.EMPTY
                     }) {
-                    return QueensHint.ExclusionZone(
+                    return QueensHint.PolyominoExclusionZone(
                         zone = zone,
                         exclusion = exclusion,
                         queensAmount = subset.size
@@ -228,14 +234,14 @@ class QueensHintsProviderImpl(private val validator: QueensValidator) : QueensHi
                         Pair(rowId, colId)
                     }
                 }.flatten()
-                val zone = subset.map { pId -> board.getPolyominoCoordinates(pId) }.flatten()
+                val zone = coordinates.flatten()
                 if (exclusion.any {
                         it !in zone && board.getStatus(
                             it.first,
                             it.second
                         ) == QueenCellStatus.EMPTY
                     }) {
-                    return QueensHint.ExclusionZone(
+                    return QueensHint.PolyominoExclusionZone(
                         zone = zone,
                         exclusion = exclusion,
                         queensAmount = subset.size
