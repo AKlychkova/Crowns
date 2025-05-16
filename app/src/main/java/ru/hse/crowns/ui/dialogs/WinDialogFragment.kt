@@ -13,6 +13,7 @@ import ru.hse.crowns.R
 class WinDialogFragment(private val prize: Int, private val onClickListener: OnClickListener) :
     DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        // win dialog cannot be cancelled
         isCancelable = false
         return activity?.let {
             val builder = AlertDialog.Builder(it)

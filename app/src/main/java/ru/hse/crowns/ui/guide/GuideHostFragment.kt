@@ -7,19 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.tabs.TabLayout
 import ru.hse.crowns.R
-import ru.hse.crowns.databinding.FragmentGuideBinding
+import ru.hse.crowns.databinding.FragmentGuideHostBinding
 
-class GuideFragment : Fragment() {
+class GuideHostFragment : Fragment() {
 
-    private var _binding: FragmentGuideBinding? = null
+    private var _binding: FragmentGuideHostBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentGuideBinding.inflate(inflater, container, false)
+        _binding = FragmentGuideHostBinding.inflate(inflater, container, false)
 
+        // Switch tab colors and guide fragments
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when(tab?.position) {

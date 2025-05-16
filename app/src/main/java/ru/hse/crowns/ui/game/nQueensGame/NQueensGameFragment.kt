@@ -37,6 +37,7 @@ class NQueensGameFragment : Fragment() {
     ): View {
         _binding = FragmentNQueensGameBinding.inflate(inflater, container, false)
 
+        // Set up recycler view
         boardAdapter = NQueensBoardRecyclerAdapter { row, column ->
             viewModel.onCellClick(
                 row,
@@ -47,8 +48,12 @@ class NQueensGameFragment : Fragment() {
         }
         binding.board.recyclerView.adapter = boardAdapter
 
+        // Set listeners
+
         binding.hintImageButton.setOnClickListener {
+            // Hint cannot be taken if there is a mistake on the board
             if (viewModel.status.value !is NQueensMistake) {
+                // If it isn't a first hint, show buy dialog
                 if (viewModel.hintCounter.value!! > 0) {
                     BuyHintDialog { _, which: Int ->
                         when (which) {
@@ -204,19 +209,24 @@ class NQueensGameFragment : Fragment() {
                         return false
                     }
                 }
+
+            // Add observers to board cells
             it.addObserver(object : BoardObserver {
                 override fun onChanged(row: Int, column: Int) {
                     boardAdapter.updateCellValue(row, column)
                 }
             })
+            // Update recycler view
             boardAdapter.setBoard(it)
         }
 
         viewModel.status.observe(viewLifecycleOwner) {
             if (it is NQueensMistake) {
+                // Show mistake
                 binding.messageTextView.text = it.getMessage()
                 boardAdapter.updateHighlights(redPositions = it.positions.toList())
             } else {
+                // Clear mistake display
                 binding.messageTextView.text = ""
                 boardAdapter.updateHighlights()
             }
@@ -244,12 +254,14 @@ class NQueensGameFragment : Fragment() {
 
         viewModel.hintCounter.observe(viewLifecycleOwner) {
             binding.hintCounterTextView.text = it.toString()
+            // Disable hint button if there is not enough money to buy one more hint
             if (it > 0 && viewModel.currentBalance.value!! < HINT_PRICE) {
                 binding.hintImageButton.isEnabled = false
             }
         }
 
         viewModel.currentBalance.observe(viewLifecycleOwner) {
+            // Disable hint button if there is not enough money to buy one more hint
             if (it < HINT_PRICE && viewModel.hintCounter.value!! > 0) {
                 binding.hintImageButton.isEnabled = false
             } else {
@@ -266,11 +278,17 @@ class NQueensGameFragment : Fragment() {
         )
     }
 
+    /**
+     * Start the chronometer from the saved in viewmodel timestamp
+     */
     private fun startChronometer() {
         binding.chronometer.base = SystemClock.elapsedRealtime() - viewModel.time
         binding.chronometer.start()
     }
 
+    /**
+     * Stop the chronometer and save time in view model
+     */
     private fun stopChronometer() {
         binding.chronometer.stop()
         viewModel.time = SystemClock.elapsedRealtime() - binding.chronometer.base
@@ -287,10 +305,11 @@ class NQueensGameFragment : Fragment() {
     }
 
     override fun onStop() {
-        super.onStop()
+        // Save not finished game
         if (viewModel.status.value != GameStatus.Win) {
             viewModel.cache()
         }
+        super.onStop()
     }
 
     override fun onDestroyView() {

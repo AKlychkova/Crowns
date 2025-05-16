@@ -102,9 +102,9 @@
     </fragment>
     <fragment
         android:id="@+id/guideFragment"
-        android:name="ru.hse.crowns.ui.guide.GuideFragment"
+        android:name="ru.hse.crowns.ui.guide.GuideHostFragment"
         android:label="fragment_guide"
-        tools:layout="@layout/fragment_guide">
+        tools:layout="@layout/fragment_guide_host">
         <argument
             android:name="ShowBottomBar"
             android:defaultValue="false"

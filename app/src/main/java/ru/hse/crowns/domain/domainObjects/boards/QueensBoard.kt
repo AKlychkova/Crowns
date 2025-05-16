@@ -331,6 +331,9 @@ class QueensBoard(
         return newBoard
     }
 
+    /**
+     * Clear all not original cells
+     */
     fun backToOriginal() {
         for(i in 0 until size) {
             for(j in 0 until size) {

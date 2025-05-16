@@ -28,6 +28,10 @@ class BalanceRepository(private val dataStore: DataStore<Preferences>) {
             preferences[COINS_BALANCE] ?: 10
         }
 
+    /**
+     * Increase current balance
+     * @param increase the number of coins by which the balance will be increased
+     */
     suspend fun increaseCoinsBalance(increase: Int) {
         dataStore.edit { balance ->
             val currentBalance = balance[COINS_BALANCE] ?: 10
@@ -35,6 +39,11 @@ class BalanceRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    /**
+     * Decrease current balance
+     * @param decrease the number of coins by which the balance will be decreased
+     * @throws IllegalArgumentException if current balance is less thn [decrease]
+     */
     suspend fun decreaseCoinsBalance(decrease: Int) {
         dataStore.edit { balance ->
             val currentBalance = balance[COINS_BALANCE] ?: 10

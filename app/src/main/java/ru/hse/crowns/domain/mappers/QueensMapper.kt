@@ -63,6 +63,13 @@ class QueensMapper(private val repository: QueensGameRepository) {
         return board
     }
 
+    /**
+     * Map to DTO and save to data store
+     * @param board game board
+     * @param time time since the beginning of the solution
+     * @param hintCount the number of taken hints
+     * @param mistakeCount the number of mistakes
+     */
     suspend fun saveGameData(board: QueensBoard, time: Long, hintCount: Int, mistakeCount: Int) {
         val game = QueensGameDTO.newBuilder()
             .setTime(time)
@@ -75,6 +82,9 @@ class QueensMapper(private val repository: QueensGameRepository) {
         }
     }
 
+    /**
+     * @return board from data source
+     */
     suspend fun getBoard(): QueensBoard {
         return mapCellsToBoard(
             withContext(Dispatchers.IO) {
@@ -83,6 +93,9 @@ class QueensMapper(private val repository: QueensGameRepository) {
         )
     }
 
+    /**
+     * @return [GameCharacteristics] from data source
+     */
     suspend fun getGameData(): GameCharacteristics {
         val game: QueensGameDTO = withContext(Dispatchers.IO) { repository.getData()!! }
         return GameCharacteristics(
@@ -92,6 +105,9 @@ class QueensMapper(private val repository: QueensGameRepository) {
         )
     }
 
+    /**
+     * Remove data from data source
+     */
     suspend fun removeData() {
         repository.removeData()
     }

@@ -8,6 +8,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import ru.hse.crowns.R
 
+/**
+ * @property onCancel on cancel dialog callback
+ */
 class PauseDialogFragment (
     private val onClickListener: OnClickListener,
     private val onCancel: () -> Unit

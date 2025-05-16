@@ -1,7 +1,5 @@
 package ru.hse.crowns.domain.domainObjects.boards
 
-import kotlin.math.abs
-
 /**
  * @property size board dimension
  * @property queenPositions queens coordinates
@@ -179,6 +177,9 @@ class NQueensBoard(val size: Int, queenPositions: Collection<Pair<Int, Int>>) : 
         return newBoard
     }
 
+    /**
+     * Clear all not original cells
+     */
     fun backToOriginal() {
         for(i in 0 until size) {
             for(j in 0 until size) {
