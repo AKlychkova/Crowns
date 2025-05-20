@@ -20,7 +20,7 @@ class KillerSudokuDLUniqueChecker : DLUniqueChecker(), KillerSudokuUniqueChecker
         for (row: BooleanArray in solution) {
             for (i: Int in 0 until board.getPolyominoCount() * board.size) {
                 if(row[4 * board.size * board.size + i]) {
-                    solutionPolyominoSums[i / board.size] += i % board.size
+                    solutionPolyominoSums[i / board.size] += i % board.size + 1
                     break
                 }
             }
@@ -75,11 +75,12 @@ class KillerSudokuDLUniqueChecker : DLUniqueChecker(), KillerSudokuUniqueChecker
         for (i: Int in 0 until board.size) {
             for (j: Int in 0 until board.size) {
                 for (value: Int in board.values) {
-                    ecMatrix[board.size * i + j][getCellIndex(board.size * i + j)] = true
-                    ecMatrix[board.size * i + j][getRowIndex(i, value)] = true
-                    ecMatrix[board.size * i + j][getColumnIndex(j, value)] = true
-                    ecMatrix[board.size * i + j][getBoxIndex(i, j, value)] = true
-                    ecMatrix[board.size * i + j][getPolyominoIndex(i, j, value)] = true
+                    val ecRow = (board.size * i + j) * board.size + value - 1
+                    ecMatrix[ecRow][getCellIndex(board.size * i + j)] = true
+                    ecMatrix[ecRow][getRowIndex(i, value)] = true
+                    ecMatrix[ecRow][getColumnIndex(j, value)] = true
+                    ecMatrix[ecRow][getBoxIndex(i, j, value)] = true
+                    ecMatrix[ecRow][getPolyominoIndex(i, j, value)] = true
                 }
             }
         }
