@@ -8,7 +8,7 @@ enum class KillerSudokuDifficultyLevel {
         override fun getMaxToDelete(): Int = 50
     },
     DIFFICULT {
-        override fun getMaxToDelete(): Int = 81
+        override fun getMaxToDelete(): Int = 60
     };
 
     abstract fun getMaxToDelete() : Int
