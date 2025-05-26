@@ -62,9 +62,11 @@ class KillerSudokuBoardRecyclerAdapter(
      * @param greenPositions positions that will be colored green
      * @param redPositions positions that will be colored red
      */
-    fun updateHighlights(greenPositions: Iterable<Pair<Int, Int>> = emptyList(),
-                         redPositions: Iterable<Pair<Int, Int>> = emptyList()) {
-        val green = greenPositions.map { it.first * board.size + it.second}.toSet()
+    fun updateHighlights(
+        greenPositions: Iterable<Pair<Int, Int>> = emptyList(),
+        redPositions: Iterable<Pair<Int, Int>> = emptyList()
+    ) {
+        val green = greenPositions.map { it.first * board.size + it.second }.toSet()
         for (position in (green - currentGreen)) {
             notifyItemChanged(position, Payload.HIGHLIGHT_GREEN)
         }
@@ -73,7 +75,7 @@ class KillerSudokuBoardRecyclerAdapter(
         }
         currentGreen = green
 
-        val red = redPositions.map { it.first * board.size + it.second}.toSet()
+        val red = redPositions.map { it.first * board.size + it.second }.toSet()
         for (position in (red - currentRed - currentGreen)) {
             notifyItemChanged(position, Payload.HIGHLIGHT_RED)
         }
@@ -98,15 +100,21 @@ class KillerSudokuBoardRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: BoardCellViewHolder, position: Int) {
-        onBindViewHolder(holder, position, mutableListOf(
-            Payload.VALUE,
-            Payload.POLYOMINO,
-            Payload.ADDITIONAL_INFO,
-            Payload.BORDERS,
-            Payload.LISTENER,
-            Payload.NOTES,
-            if(position in currentRed) Payload.HIGHLIGHT_RED else Payload.REMOVE_HIGHLIGHT,
-        if(position in currentGreen) Payload.HIGHLIGHT_GREEN else Payload.REMOVE_HIGHLIGHT))
+        onBindViewHolder(
+            holder, position, mutableListOf(
+                Payload.VALUE,
+                Payload.POLYOMINO,
+                Payload.ADDITIONAL_INFO,
+                Payload.BORDERS,
+                Payload.LISTENER,
+                Payload.NOTES,
+                when (position) {
+                    in currentRed -> Payload.HIGHLIGHT_RED
+                    in currentGreen -> Payload.HIGHLIGHT_GREEN
+                    else -> Payload.REMOVE_HIGHLIGHT
+                }
+            )
+        )
     }
 
     override fun onBindViewHolder(
@@ -146,7 +154,7 @@ class KillerSudokuBoardRecyclerAdapter(
                                 null
                             },
                             value?.toString() ?: emptyString,
-                            if(!board.isOriginal(row, column)) {
+                            if (!board.isOriginal(row, column)) {
                                 userColor
                             } else {
                                 originalColor
@@ -160,7 +168,7 @@ class KillerSudokuBoardRecyclerAdapter(
                         holder.setPolyominoColor(polyominoId)
                     }
 
-                    Payload.ADDITIONAL_INFO ->  {
+                    Payload.ADDITIONAL_INFO -> {
                         // If cell has the smallest coordinates in its polyomino,
                         // write polyomino total as additional information
 
@@ -196,7 +204,7 @@ class KillerSudokuBoardRecyclerAdapter(
 
                     Payload.NOTES -> {
                         holder.clearNotes()
-                        for(note in board.getNotes(row, column)) {
+                        for (note in board.getNotes(row, column)) {
                             holder.setNote(note.toString(), note - 1)
                         }
                     }

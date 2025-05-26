@@ -186,27 +186,6 @@ class KillerSudokuGameFragment : Fragment() {
             }
         }
 
-        viewModel.mistakeCounter.observe(viewLifecycleOwner) {
-            binding.mistakeCounterTextView.text = it.toString()
-        }
-
-        viewModel.hintCounter.observe(viewLifecycleOwner) {
-            binding.hintCounterTextView.text = it.toString()
-            if (it > 0 && viewModel.currentBalance.value!! < HINT_PRICE) {
-                // Disable hint button if there is not enough money to buy one more hint
-                binding.hintImageButton.isEnabled = false
-            }
-        }
-
-        viewModel.currentBalance.observe(viewLifecycleOwner) {
-            // Disable hint button if there is not enough money to buy one more hint
-            if (it < HINT_PRICE && viewModel.hintCounter.value!! > 0) {
-                binding.hintImageButton.isEnabled = false
-            } else {
-                binding.hintImageButton.isEnabled = true
-            }
-        }
-
         viewModel.hint.observe(viewLifecycleOwner) {
             when (it) {
                 is KillerSudokuHint.OneEmptyInColumn -> {
@@ -249,6 +228,30 @@ class KillerSudokuGameFragment : Fragment() {
                     binding.messageTextView.text =
                         getString(R.string.ksudoku_one_in_box_hint_text, it.value)
                 }
+
+                null -> {}
+            }
+        }
+
+
+        viewModel.mistakeCounter.observe(viewLifecycleOwner) {
+            binding.mistakeCounterTextView.text = it.toString()
+        }
+
+        viewModel.hintCounter.observe(viewLifecycleOwner) {
+            binding.hintCounterTextView.text = it.toString()
+            if (it > 0 && viewModel.currentBalance.value!! < HINT_PRICE) {
+                // Disable hint button if there is not enough money to buy one more hint
+                binding.hintImageButton.isEnabled = false
+            }
+        }
+
+        viewModel.currentBalance.observe(viewLifecycleOwner) {
+            // Disable hint button if there is not enough money to buy one more hint
+            if (it < HINT_PRICE && viewModel.hintCounter.value!! > 0) {
+                binding.hintImageButton.isEnabled = false
+            } else {
+                binding.hintImageButton.isEnabled = true
             }
         }
     }

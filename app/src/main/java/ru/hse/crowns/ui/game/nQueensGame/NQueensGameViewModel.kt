@@ -1,6 +1,5 @@
 package ru.hse.crowns.ui.game.nQueensGame
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,8 +50,8 @@ class NQueensGameViewModel(
     private val _hintCounter = MutableLiveData<Int>(0)
     val hintCounter: LiveData<Int> get() = _hintCounter
 
-    private var _hint = MutableLiveData<NQueensHint>()
-    val hint: LiveData<NQueensHint> = _hint
+    private var _hint = MutableLiveData<NQueensHint?>()
+    val hint: LiveData<NQueensHint?> = _hint
 
     val currentBalance = balanceRepository.coinsBalanceFlow.asLiveData()
 
@@ -104,7 +103,7 @@ class NQueensGameViewModel(
      */
     fun updateBoard(fromDataStore: Boolean, boardSize: Int) {
         if (!boardLD.isInitialized) {
-            if(fromDataStore) {
+            if (fromDataStore) {
                 readFromDataStore()
             } else {
                 generateBoard(boardSize)
@@ -121,17 +120,21 @@ class NQueensGameViewModel(
      */
     fun onCellClick(row: Int, column: Int, eraseMode: Boolean, noteMode: Boolean) {
         boardLD.value?.let { board ->
-            val status = board.getStatus(row, column)
-            if (status != QueenCellStatus.ORIGINAL_QUEEN) {
+            val cellStatus = board.getStatus(row, column)
+            if (cellStatus != QueenCellStatus.ORIGINAL_QUEEN) {
                 if (eraseMode) {
                     board.clearCell(row, column)
-                } else if (noteMode && status != QueenCellStatus.CROSS) {
+                } else if (noteMode && cellStatus != QueenCellStatus.CROSS) {
                     board.setCross(row, column)
-                } else if (!noteMode && status != QueenCellStatus.USER_QUEEN) {
+                } else if (!noteMode && cellStatus != QueenCellStatus.USER_QUEEN) {
                     board.addUserQueen(row, column)
                 } else {
                     board.clearCell(row, column)
                 }
+            }
+
+            if (hint.value != null) {
+                _hint.value = null
             }
 
             val mistake: NQueensMistake? = boardValidator.check(board)
@@ -185,14 +188,17 @@ class NQueensGameViewModel(
      * Save current game state
      */
     fun cache() = viewModelScope.launch(Dispatchers.Default) {
-        withContext(NonCancellable) {
-            gameDataMapper.saveGameData(
-                board = boardLD.value!!,
-                time = time,
-                hintCount = hintCounter.value!!,
-                mistakeCount = mistakeCounter.value!!
-            )
-            Log.d("save", "n queens data saved")
+        if (boardLD.value != null) {
+            withContext(NonCancellable) {
+                gameDataMapper.saveGameData(
+                    board = boardLD.value!!,
+                    time = time,
+                    hintCount = hintCounter.value!!,
+                    mistakeCount = mistakeCounter.value!!
+                )
+            }
+        } else {
+            getBoardJob?.cancel()
         }
     }
 

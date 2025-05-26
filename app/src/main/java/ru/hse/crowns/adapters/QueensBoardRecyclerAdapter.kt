@@ -49,9 +49,11 @@ class QueensBoardRecyclerAdapter(
         notifyItemChanged(row * board.size + column, Payload.VALUE)
     }
 
-    fun updateHighlights(greenPositions: Iterable<Pair<Int, Int>> = emptyList(),
-                         redPositions: Iterable<Pair<Int, Int>> = emptyList()) {
-        val green = greenPositions.map { it.first * board.size + it.second}.toSet()
+    fun updateHighlights(
+        greenPositions: Iterable<Pair<Int, Int>> = emptyList(),
+        redPositions: Iterable<Pair<Int, Int>> = emptyList()
+    ) {
+        val green = greenPositions.map { it.first * board.size + it.second }.toSet()
         for (position in (green - currentGreen)) {
             notifyItemChanged(position, Payload.HIGHLIGHT_GREEN)
         }
@@ -60,7 +62,7 @@ class QueensBoardRecyclerAdapter(
         }
         currentGreen = green
 
-        val red = redPositions.map { it.first * board.size + it.second}.toSet()
+        val red = redPositions.map { it.first * board.size + it.second }.toSet()
         for (position in (red - currentRed - currentGreen)) {
             notifyItemChanged(position, Payload.HIGHLIGHT_RED)
         }
@@ -85,12 +87,18 @@ class QueensBoardRecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: BoardCellViewHolder, position: Int) {
-        onBindViewHolder(holder, position, mutableListOf(
-            Payload.VALUE,
-            Payload.POLYOMINO,
-            Payload.LISTENER,
-            if(position in currentRed) Payload.HIGHLIGHT_RED else Payload.REMOVE_HIGHLIGHT,
-            if(position in currentGreen) Payload.HIGHLIGHT_GREEN else Payload.REMOVE_HIGHLIGHT))
+        onBindViewHolder(
+            holder, position, mutableListOf(
+                Payload.VALUE,
+                Payload.POLYOMINO,
+                Payload.LISTENER,
+                when (position) {
+                    in currentRed -> Payload.HIGHLIGHT_RED
+                    in currentGreen -> Payload.HIGHLIGHT_GREEN
+                    else -> Payload.REMOVE_HIGHLIGHT
+                }
+            )
+        )
     }
 
     override fun onBindViewHolder(

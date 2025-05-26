@@ -269,6 +269,8 @@ class QueensGameFragment : Fragment() {
                     binding.messageTextView.text =
                         getString(R.string.queens_one_in_polyomino_hint_text)
                 }
+
+                null -> {}
             }
         }
 

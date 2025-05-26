@@ -49,8 +49,8 @@ class KillerSudokuGameViewModel(
     private val _hintCounter = MutableLiveData<Int>(0)
     val hintCounter: LiveData<Int> get() = _hintCounter
 
-    private var _hint = MutableLiveData<KillerSudokuHint>()
-    val hint: LiveData<KillerSudokuHint> = _hint
+    private var _hint = MutableLiveData<KillerSudokuHint?>()
+    val hint: LiveData<KillerSudokuHint?> = _hint
 
     val currentBalance = balanceRepository.coinsBalanceFlow.asLiveData()
 
@@ -143,6 +143,10 @@ class KillerSudokuGameViewModel(
                 }
             }
 
+            if(hint.value != null) {
+                _hint.value = null
+            }
+
             // Check for mistakes
             val mistake: KillerSudokuMistake? = boardValidator.check(board)
             if (mistake != null) {
@@ -203,14 +207,19 @@ class KillerSudokuGameViewModel(
      * Save current game state
      */
     fun cache(level: Int) = viewModelScope.launch(Dispatchers.Default) {
-        withContext(NonCancellable) {
-            gameDataMapper.saveGameData(
-                board = boardLD.value!!,
-                time = time,
-                hintCount = hintCounter.value!!,
-                mistakeCount = mistakeCounter.value!!,
-                level = level
-            )
+        if(boardLD.value != null) {
+            withContext(NonCancellable) {
+
+                gameDataMapper.saveGameData(
+                    board = boardLD.value!!,
+                    time = time,
+                    hintCount = hintCounter.value!!,
+                    mistakeCount = mistakeCounter.value!!,
+                    level = level
+                )
+            }
+        } else {
+            getBoardJob?.cancel()
         }
     }
 

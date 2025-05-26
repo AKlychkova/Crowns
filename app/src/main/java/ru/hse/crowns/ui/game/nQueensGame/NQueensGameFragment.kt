@@ -124,6 +124,52 @@ class NQueensGameFragment : Fragment() {
             }
         }
 
+        viewModel.boardLD.observe(viewLifecycleOwner) {
+            binding.board.recyclerView.layoutManager =
+                object : GridLayoutManager(context, it.size) {
+                    override fun canScrollVertically(): Boolean {
+                        return false
+                    }
+                }
+
+            // Add observers to board cells
+            it.addObserver(object : BoardObserver {
+                override fun onChanged(row: Int, column: Int) {
+                    boardAdapter.updateCellValue(row, column)
+                }
+            })
+            // Update recycler view
+            boardAdapter.setBoard(it)
+        }
+
+        viewModel.status.observe(viewLifecycleOwner) {
+            if (it is NQueensMistake) {
+                // Show mistake
+                binding.messageTextView.text = it.getMessage()
+                boardAdapter.updateHighlights(redPositions = it.positions.toList())
+            } else {
+                // Clear mistake display
+                binding.messageTextView.text = ""
+                boardAdapter.updateHighlights()
+            }
+            if (it is GameStatus.Win) {
+                stopChronometer()
+                WinDialogFragment(
+                    viewModel.calculatePrize()
+                ) { _, which: Int ->
+                    when (which) {
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            viewModel.startNewGame()
+                            viewModel.time = 0
+                            startChronometer()
+                        }
+
+                        DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
+                    }
+                }.show(childFragmentManager, "WinDialog")
+            }
+        }
+
         viewModel.hint.observe(viewLifecycleOwner) {
             when (it) {
                 is NQueensHint.RowExclusionZone -> {
@@ -199,52 +245,8 @@ class NQueensGameFragment : Fragment() {
                     boardAdapter.updateHighlights()
                     binding.messageTextView.text = getString(R.string.undefined_hint_text)
                 }
-            }
-        }
 
-        viewModel.boardLD.observe(viewLifecycleOwner) {
-            binding.board.recyclerView.layoutManager =
-                object : GridLayoutManager(context, it.size) {
-                    override fun canScrollVertically(): Boolean {
-                        return false
-                    }
-                }
-
-            // Add observers to board cells
-            it.addObserver(object : BoardObserver {
-                override fun onChanged(row: Int, column: Int) {
-                    boardAdapter.updateCellValue(row, column)
-                }
-            })
-            // Update recycler view
-            boardAdapter.setBoard(it)
-        }
-
-        viewModel.status.observe(viewLifecycleOwner) {
-            if (it is NQueensMistake) {
-                // Show mistake
-                binding.messageTextView.text = it.getMessage()
-                boardAdapter.updateHighlights(redPositions = it.positions.toList())
-            } else {
-                // Clear mistake display
-                binding.messageTextView.text = ""
-                boardAdapter.updateHighlights()
-            }
-            if (it is GameStatus.Win) {
-                stopChronometer()
-                WinDialogFragment(
-                    viewModel.calculatePrize()
-                ) { _, which: Int ->
-                    when (which) {
-                        DialogInterface.BUTTON_POSITIVE -> {
-                            viewModel.startNewGame()
-                            viewModel.time = 0
-                            startChronometer()
-                        }
-
-                        DialogInterface.BUTTON_NEUTRAL -> findNavController().popBackStack()
-                    }
-                }.show(childFragmentManager, "WinDialog")
+                null -> {}
             }
         }
 

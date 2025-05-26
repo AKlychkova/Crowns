@@ -1,5 +1,8 @@
 package ru.hse.crowns.domain.generation.dancingLinks
 
+import kotlinx.coroutines.isActive
+import kotlin.coroutines.coroutineContext
+
 /**
  * Check if exact cover problem has no more than one solution
  */
@@ -30,7 +33,11 @@ abstract class DLUniqueChecker {
      * Recursive procedure for finding solutions of exact cover problem
      * described in D. E. Knuth's [article](https://doi.org/10.48550/arXiv.cs/0011047)
      */
-    private fun search(): Boolean {
+    private suspend fun search(): Boolean {
+        if(!coroutineContext.isActive) {
+            return false
+        }
+
         // Base case: exact cover has been found
         if (problem.header.right == problem.header) {
             // Check predicate if necessary
@@ -112,7 +119,7 @@ abstract class DLUniqueChecker {
     /**
      * @return true if created by [createDLMatrix] method matrix has no more than one solution, otherwise false
      */
-    protected fun check(): Boolean {
+    protected suspend fun check(): Boolean {
         problem = createDLMatrix()
         solutionsNum = 0
         solution = ArrayList()

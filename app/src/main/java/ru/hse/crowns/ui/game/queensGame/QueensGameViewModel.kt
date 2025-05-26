@@ -1,6 +1,5 @@
 package ru.hse.crowns.ui.game.queensGame
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -52,8 +50,8 @@ class QueensGameViewModel(
     private val _hintCounter = MutableLiveData<Int>(0)
     val hintCounter: LiveData<Int> get() = _hintCounter
 
-    private var _hint = MutableLiveData<QueensHint>()
-    val hint: LiveData<QueensHint> = _hint
+    private var _hint = MutableLiveData<QueensHint?>()
+    val hint: LiveData<QueensHint?> = _hint
 
     val currentBalance = balanceRepository.coinsBalanceFlow.asLiveData()
 
@@ -105,7 +103,7 @@ class QueensGameViewModel(
      */
     fun updateBoard(fromDataStore: Boolean, boardSize: Int) {
         if (!boardLD.isInitialized) {
-            if(fromDataStore) {
+            if (fromDataStore) {
                 readFromDataStore()
             } else {
                 generateBoard(boardSize)
@@ -135,6 +133,10 @@ class QueensGameViewModel(
                 }
             }
 
+            if (hint.value != null) {
+                _hint.value = null
+            }
+
             val mistake: QueensMistake? = boardValidator.check(board)
             if (mistake != null) {
                 _mistakeCounter.value = (_mistakeCounter.value ?: 0) + 1
@@ -148,7 +150,7 @@ class QueensGameViewModel(
         }
     }
 
-    private fun clearCache() = viewModelScope.launch(Dispatchers.IO){
+    private fun clearCache() = viewModelScope.launch(Dispatchers.IO) {
         gameDataMapper.removeData()
     }
 
@@ -170,7 +172,7 @@ class QueensGameViewModel(
      * Increase coins balance
      * @param prize the number of coins by which the balance will be increased
      */
-    private fun increaseBalance(prize:Int) = viewModelScope.launch(Dispatchers.IO) {
+    private fun increaseBalance(prize: Int) = viewModelScope.launch(Dispatchers.IO) {
         balanceRepository.increaseCoinsBalance(prize)
     }
 
@@ -188,14 +190,17 @@ class QueensGameViewModel(
      * Save current game state
      */
     fun cache() = viewModelScope.launch(Dispatchers.Default) {
-        withContext(NonCancellable) {
-            gameDataMapper.saveGameData(
-                board = boardLD.value!!,
-                time = time,
-                hintCount = hintCounter.value!!,
-                mistakeCount = mistakeCounter.value!!
-            )
-            Log.d("save", "queens data saved")
+        if (boardLD.value != null) {
+            withContext(NonCancellable) {
+                gameDataMapper.saveGameData(
+                    board = boardLD.value!!,
+                    time = time,
+                    hintCount = hintCounter.value!!,
+                    mistakeCount = mistakeCounter.value!!
+                )
+            }
+        } else {
+            getBoardJob?.cancel()
         }
     }
 
