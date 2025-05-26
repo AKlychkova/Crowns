@@ -1,5 +1,6 @@
 package ru.hse.crowns
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 import ru.hse.crowns.domain.generation.dancingLinks.DLMatrix
@@ -9,7 +10,7 @@ import ru.hse.crowns.domain.generation.dancingLinks.DLUniqueChecker
 class DLUniqueCheckerTest {
 
     @Test
-    fun testSmallUniqueWithoutSecondary() {
+    fun testSmallUniqueWithoutSecondary() = runTest {
         val test = object : DLUniqueChecker() {
             override val solutionPredicate: ((Array<BooleanArray>) -> Boolean)? = null
 
@@ -24,7 +25,7 @@ class DLUniqueCheckerTest {
                 )
             }
 
-            fun test() {
+            suspend fun test() {
                 assertTrue(check())
             }
         }
@@ -32,7 +33,7 @@ class DLUniqueCheckerTest {
     }
 
     @Test
-    fun testSmallNonUniqueWithoutSecondary() {
+    fun testSmallNonUniqueWithoutSecondary() = runTest {
         val test = object : DLUniqueChecker() {
             override val solutionPredicate: ((Array<BooleanArray>) -> Boolean)? = null
 
@@ -47,7 +48,7 @@ class DLUniqueCheckerTest {
                 )
             }
 
-            fun test() {
+            suspend fun test() {
                 assertFalse(check())
             }
         }
@@ -55,7 +56,7 @@ class DLUniqueCheckerTest {
     }
 
     @Test
-    fun testUniqueWithoutSecondary() {
+    fun testUniqueWithoutSecondary() = runTest {
         val test = object : DLUniqueChecker() {
             override val solutionPredicate: ((Array<BooleanArray>) -> Boolean)? = null
 
@@ -72,7 +73,7 @@ class DLUniqueCheckerTest {
                 )
             }
 
-            fun test() {
+            suspend fun test() {
                 assertTrue(check())
             }
         }
@@ -80,7 +81,7 @@ class DLUniqueCheckerTest {
     }
 
     @Test
-    fun testNonUniqueWithoutSecondary() {
+    fun testNonUniqueWithoutSecondary() = runTest {
         val test = object : DLUniqueChecker() {
             override val solutionPredicate: ((Array<BooleanArray>) -> Boolean)? = null
 
@@ -99,7 +100,7 @@ class DLUniqueCheckerTest {
                 )
             }
 
-            fun test() {
+            suspend fun test() {
                 assertFalse(check())
             }
         }
@@ -107,7 +108,7 @@ class DLUniqueCheckerTest {
     }
 
     @Test
-    fun testNonUniqueWithSecondary() {
+    fun testNonUniqueWithSecondary() = runTest {
         val test = object : DLUniqueChecker() {
             override val solutionPredicate: ((Array<BooleanArray>) -> Boolean)? = null
 
@@ -125,7 +126,7 @@ class DLUniqueCheckerTest {
                 )
             }
 
-            fun test() {
+            suspend fun test() {
                 assertFalse(check())
             }
         }
@@ -133,7 +134,7 @@ class DLUniqueCheckerTest {
     }
 
     @Test
-    fun testUniqueWithSecondary() {
+    fun testUniqueWithSecondary()= runTest {
         val test = object : DLUniqueChecker() {
             override val solutionPredicate: ((Array<BooleanArray>) -> Boolean)? = null
 
@@ -151,7 +152,7 @@ class DLUniqueCheckerTest {
                 )
             }
 
-            fun test() {
+            suspend fun test() {
                 assertTrue(check())
             }
         }
