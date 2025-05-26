@@ -2,6 +2,7 @@ package ru.hse.crowns.domain.generation.killerSudoku
 
 import ru.hse.crowns.domain.domainObjects.boards.KillerSudokuBoard
 import ru.hse.crowns.domain.generation.Generator
+import kotlin.math.roundToInt
 
 class KillerSudokuGenerator(private val uniqueChecker: KillerSudokuUniqueChecker,
                             private val solutionGenerator: KillerSudokuSolutionGenerator
@@ -13,18 +14,25 @@ class KillerSudokuGenerator(private val uniqueChecker: KillerSudokuUniqueChecker
      * @param maxToClear maximum number of empty cells in generated Killer Sudoku level
      */
     private suspend fun clearCells(maxToClear: Int, board: KillerSudokuBoard) {
-        for (cell in (0 until board.size * board.size).shuffled()) {
-            if (board.emptyCellsCount >= maxToClear) {
+        val clearPerIter: Int = (maxToClear * 0.1).roundToInt()
+        for (toClear in (0 until board.size * board.size).shuffled().chunked(clearPerIter)) {
+            if (board.emptyCellsCount + toClear.size >= maxToClear) {
                 break
             }
-            val cellValue : Int = board.getValue(cell / board.size, cell % board.size)!!
-            board.clearCell(cell / board.size, cell % board.size)
+            val cellsValues: List<Int>  = toClear.map { cell ->
+                board.getValue(cell / board.size, cell % board.size)!!
+            }
+            toClear.forEach { cell ->
+                board.clearCell(cell / board.size, cell % board.size)
+            }
             if (!uniqueChecker.check(board)) {
-                board.fillCell(
-                    cell / board.size,
-                    cell % board.size,
-                    cellValue
-                )
+                toClear.forEachIndexed { index, cell ->
+                    board.fillCell(
+                        cell / board.size,
+                        cell % board.size,
+                        cellsValues[index]
+                    )
+                }
             }
         }
     }
