@@ -118,7 +118,7 @@ class KillerSudokuBoard internal constructor(
             sudokuGrid[row][col] = 0
         }
         clearNotes(row, col)
-        // claerNotes has already called notifyObservers()
+        // clearNotes has already called notifyObservers()
     }
 
     /**
@@ -166,7 +166,9 @@ class KillerSudokuBoard internal constructor(
             throw IllegalArgumentException("Cell contains 'original' value.")
         }
         clearNotes(row, col)
-        emptyCellsCount -= 1
+        if(isEmpty(row, col)) {
+            emptyCellsCount -= 1
+        }
         sudokuGrid[row][col] = -value
         notifyObservers(row, col)
     }
