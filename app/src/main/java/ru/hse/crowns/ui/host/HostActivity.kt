@@ -11,7 +11,7 @@ import ru.hse.crowns.databinding.ActivityHostBinding
 
 class HostActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHostBinding
+    lateinit var binding: ActivityHostBinding
     private val viewModel : HostViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
